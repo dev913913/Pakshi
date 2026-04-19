@@ -203,6 +203,25 @@ header {
 
 .now-playing.visible { transform: translateY(0); }
 
+.audio-warning {
+  position: fixed;
+  left: 50%;
+  bottom: 78px;
+  transform: translateX(-50%);
+  z-index: 120;
+  background: rgba(30, 10, 10, 0.92);
+  border: 1px solid rgba(255, 120, 120, 0.35);
+  color: #ffd6d6;
+  padding: 10px 14px;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.audio-warning.visible { opacity: 1; }
+
 .np-wave {
   display: flex;
   align-items: center;
@@ -681,6 +700,7 @@ footer {
   </div>
   <button class="np-stop" onclick="stopAll()">■ Stop</button>
 </div>
+<div class="audio-warning" id="audioWarning" role="status" aria-live="polite"></div>
 
 <script>
 // ── BIRD DATA ──
@@ -859,6 +879,49 @@ const BIRDS = [
 let currentAudio = null;
 let currentBirdId = null;
 
+function supportsOgg() {
+  const probe = document.createElement('audio');
+  return !!probe.canPlayType && probe.canPlayType('audio/ogg; codecs="vorbis"') !== '';
+}
+
+function supportsMp3() {
+  const probe = document.createElement('audio');
+  return !!probe.canPlayType && probe.canPlayType('audio/mpeg') !== '';
+}
+
+function deriveWikimediaMp3(url) {
+  if (!url || !url.includes('upload.wikimedia.org/wikipedia/commons/')) return null;
+  const fileName = url.split('/').pop();
+  if (!fileName || !fileName.toLowerCase().endsWith('.ogg')) return null;
+  return url
+    .replace('/wikipedia/commons/', '/wikipedia/commons/transcoded/')
+    .concat(`/${fileName}.mp3`);
+}
+
+function getPlayableSource(bird) {
+  const primary = bird.sound || '';
+  const fallback = bird.soundFallback || deriveWikimediaMp3(primary) || '';
+  const primaryIsOgg = primary.toLowerCase().endsWith('.ogg') || primary.toLowerCase().endsWith('.oga');
+  const fallbackIsMp3 = fallback.toLowerCase().endsWith('.mp3');
+
+  if (primaryIsOgg && !supportsOgg()) {
+    if (fallback && (!fallbackIsMp3 || supportsMp3())) return fallback;
+    return null;
+  }
+
+  if (primary) return primary;
+  if (fallback && (!fallbackIsMp3 || supportsMp3())) return fallback;
+  return null;
+}
+
+function showAudioWarning(message) {
+  const warning = document.getElementById('audioWarning');
+  warning.textContent = message;
+  warning.classList.add('visible');
+  clearTimeout(showAudioWarning._timer);
+  showAudioWarning._timer = setTimeout(() => warning.classList.remove('visible'), 5000);
+}
+
 // ── RENDER GRID ──
 function renderGrid() {
   const grid = document.getElementById('birdsGrid');
@@ -906,9 +969,16 @@ function playBird(id) {
   currentBirdId = id;
 
   // Play audio
-  currentAudio = new Audio(bird.sound);
+  const source = getPlayableSource(bird);
+  if (!source) {
+    showAudioWarning('No supported audio format found in this browser for this bird sound.');
+    return;
+  }
+
+  currentAudio = new Audio(source);
+  currentAudio.preload = 'auto';
   currentAudio.play().catch(() => {
-    // Audio blocked — still show UI
+    showAudioWarning('Audio could not play. Tap again, disable mute, or check browser audio format support.');
   });
 
   currentAudio.onended = () => {
