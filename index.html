@@ -927,7 +927,7 @@ async function getWikimediaTranscodedMp3(url) {
   }
 }
 
-async function getPlayableSource(bird) {
+function getPlayableSource(bird) {
   const primary = bird.sound || '';
   const primaryIsOgg = primary.toLowerCase().endsWith('.ogg') || primary.toLowerCase().endsWith('.oga');
   const explicitFallback = bird.soundFallback || '';
@@ -940,8 +940,8 @@ async function getPlayableSource(bird) {
   }
 
   if (primaryIsOgg && supportsMp3()) {
-    const transcoded = await getWikimediaTranscodedMp3(primary);
-    if (transcoded) return transcoded;
+    const cached = wikimediaFallbackCache.get(primary);
+    if (cached) return cached;
   }
 
   if (!primaryIsOgg && primary) return primary;
@@ -951,6 +951,11 @@ async function getPlayableSource(bird) {
   }
 
   return primary || null;
+}
+
+function primeWikimediaFallback(url) {
+  if (!url || !supportsMp3()) return;
+  getWikimediaTranscodedMp3(url).catch(() => null);
 }
 
 function showAudioWarning(message) {
@@ -985,7 +990,7 @@ function renderGrid() {
 }
 
 // ── PLAY BIRD ──
-async function playBird(id) {
+function playBird(id) {
   const bird = BIRDS.find(b => b.id === id);
   if (!bird) return;
 
@@ -1008,9 +1013,10 @@ async function playBird(id) {
   currentBirdId = id;
 
   // Play audio
-  const source = await getPlayableSource(bird);
+  const source = getPlayableSource(bird);
   if (!source) {
-    showAudioWarning('Could not resolve a playable online source for this bird in your browser.');
+    primeWikimediaFallback(bird.sound);
+    showAudioWarning('Preparing compatible online audio. Please tap this bird again in a moment.');
     return;
   }
 
@@ -1151,6 +1157,7 @@ function updateFact(bird) {
 
 // ── INIT ──
 renderGrid();
+BIRDS.forEach(bird => primeWikimediaFallback(bird.sound));
 </script>
 </body>
 </html>
