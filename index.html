@@ -203,6 +203,25 @@ header {
 
 .now-playing.visible { transform: translateY(0); }
 
+.audio-warning {
+  position: fixed;
+  left: 50%;
+  bottom: 78px;
+  transform: translateX(-50%);
+  z-index: 120;
+  background: rgba(30, 10, 10, 0.92);
+  border: 1px solid rgba(255, 120, 120, 0.35);
+  color: #ffd6d6;
+  padding: 10px 14px;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.audio-warning.visible { opacity: 1; }
+
 .np-wave {
   display: flex;
   align-items: center;
@@ -681,6 +700,7 @@ footer {
   </div>
   <button class="np-stop" onclick="stopAll()">■ Stop</button>
 </div>
+<div class="audio-warning" id="audioWarning" role="status" aria-live="polite"></div>
 
 <script>
 // ── BIRD DATA ──
@@ -859,6 +879,93 @@ const BIRDS = [
 let currentAudio = null;
 let currentBirdId = null;
 
+function supportsOgg() {
+  const probe = document.createElement('audio');
+  return !!probe.canPlayType && probe.canPlayType('audio/ogg; codecs="vorbis"') !== '';
+}
+
+function supportsMp3() {
+  const probe = document.createElement('audio');
+  return !!probe.canPlayType && probe.canPlayType('audio/mpeg') !== '';
+}
+
+function getFileNameFromUrl(url) {
+  try {
+    const fileName = decodeURIComponent(url.split('/').pop() || '');
+    return fileName || null;
+  } catch {
+    return null;
+  }
+}
+
+const wikimediaFallbackCache = new Map();
+
+async function getWikimediaTranscodedMp3(url) {
+  if (!url || !url.includes('upload.wikimedia.org/wikipedia/commons/')) return null;
+  if (wikimediaFallbackCache.has(url)) return wikimediaFallbackCache.get(url);
+
+  const fileName = getFileNameFromUrl(url);
+  if (!fileName || !fileName.toLowerCase().endsWith('.ogg')) return null;
+
+  const apiUrl =
+    `https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*` +
+    `&prop=videoinfo&viprop=derivatives&titles=File:${encodeURIComponent(fileName)}`;
+
+  try {
+    const res = await fetch(apiUrl);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const pages = data?.query?.pages ? Object.values(data.query.pages) : [];
+    const derivatives = pages?.[0]?.videoinfo?.[0]?.derivatives || [];
+    const mp3 = derivatives.find(d =>
+      (d?.type || '').includes('audio/mpeg') || (d?.src || '').toLowerCase().endsWith('.mp3')
+    )?.src || null;
+    wikimediaFallbackCache.set(url, mp3);
+    return mp3;
+  } catch {
+    return null;
+  }
+}
+
+function getPlayableSource(bird) {
+  const primary = bird.sound || '';
+  const primaryIsOgg = primary.toLowerCase().endsWith('.ogg') || primary.toLowerCase().endsWith('.oga');
+  const explicitFallback = bird.soundFallback || '';
+
+  if (primaryIsOgg && supportsOgg()) return primary;
+
+  if (explicitFallback) {
+    const fallbackIsMp3 = explicitFallback.toLowerCase().endsWith('.mp3');
+    if (!fallbackIsMp3 || supportsMp3()) return explicitFallback;
+  }
+
+  if (primaryIsOgg && supportsMp3()) {
+    const cached = wikimediaFallbackCache.get(primary);
+    if (cached) return cached;
+  }
+
+  if (!primaryIsOgg && primary) return primary;
+
+  if (primaryIsOgg && !supportsOgg()) {
+    return null;
+  }
+
+  return primary || null;
+}
+
+function primeWikimediaFallback(url) {
+  if (!url || !supportsMp3()) return;
+  getWikimediaTranscodedMp3(url).catch(() => null);
+}
+
+function showAudioWarning(message) {
+  const warning = document.getElementById('audioWarning');
+  warning.textContent = message;
+  warning.classList.add('visible');
+  clearTimeout(showAudioWarning._timer);
+  showAudioWarning._timer = setTimeout(() => warning.classList.remove('visible'), 5000);
+}
+
 // ── RENDER GRID ──
 function renderGrid() {
   const grid = document.getElementById('birdsGrid');
@@ -906,9 +1013,17 @@ function playBird(id) {
   currentBirdId = id;
 
   // Play audio
-  currentAudio = new Audio(bird.sound);
+  const source = getPlayableSource(bird);
+  if (!source) {
+    primeWikimediaFallback(bird.sound);
+    showAudioWarning('Preparing compatible online audio. Please tap this bird again in a moment.');
+    return;
+  }
+
+  currentAudio = new Audio(source);
+  currentAudio.preload = 'auto';
   currentAudio.play().catch(() => {
-    // Audio blocked — still show UI
+    showAudioWarning('Audio could not play. Tap again, disable mute, or check browser audio format support.');
   });
 
   currentAudio.onended = () => {
@@ -1042,6 +1157,7 @@ function updateFact(bird) {
 
 // ── INIT ──
 renderGrid();
+BIRDS.forEach(bird => primeWikimediaFallback(bird.sound));
 </script>
 </body>
 </html>
