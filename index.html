@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Pakshi — Indian Bird Sound Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0d1117;
+  --text: #e8e0d4;
+  --muted: rgba(232,224,212,0.45);
+  --card: rgba(255,255,255,0.04);
+  --card-hover: rgba(255,255,255,0.08);
+  --border: rgba(255,255,255,0.08);
+  --accent: #7eb89a;
+  --transition: 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background var(--transition);
+  cursor: default;
+}
+
+/* ── BACKGROUND SYSTEM ── */
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  transition: opacity var(--transition);
+  pointer-events: none;
+}
+
+/* Default — dark forest night */
+.bg-default {
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(30,60,30,0.4) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(20,40,60,0.3) 0%, transparent 50%),
+    linear-gradient(160deg, #0d1117 0%, #0a1a0e 50%, #0d1117 100%);
+  opacity: 1;
+}
+
+.bg-active { opacity: 0; }
+.bg-active.visible { opacity: 1; }
+
+/* Animated particles */
+.particles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  animation: drift linear infinite;
+  opacity: 0;
+}
+
+@keyframes drift {
+  0% { transform: translateY(100vh) translateX(0) scale(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(-20vh) translateX(var(--drift)) scale(1.5); opacity: 0; }
+}
+
+/* Flying bird silhouettes */
+.bird-silhouette {
+  position: fixed;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  animation: flyAcross linear infinite;
+}
+
+.bird-silhouette.active { opacity: 0.12; }
+
+@keyframes flyAcross {
+  0% { transform: translateX(-100px) translateY(0); }
+  50% { transform: translateX(50vw) translateY(var(--flydip)); }
+  100% { transform: translateX(calc(100vw + 100px)) translateY(0); }
+}
+
+/* Ripple effect */
+.ripple-container {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.15);
+  animation: rippleOut 3s ease-out forwards;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes rippleOut {
+  0% { width: 0; height: 0; opacity: 0.8; }
+  100% { width: 600px; height: 600px; opacity: 0; }
+}
+
+/* ── LAYOUT ── */
+.wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 100px;
+}
+
+/* ── HEADER ── */
+header {
+  text-align: center;
+  padding: 72px 0 56px;
+  animation: fadeUp 0.8s ease both;
+}
+
+.header-eyebrow {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 6px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.header-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(52px, 8vw, 86px);
+  font-weight: 600;
+  line-height: 0.95;
+  color: var(--text);
+  letter-spacing: -1px;
+}
+
+.header-title em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.header-hindi {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(16px, 3vw, 22px);
+  color: var(--muted);
+  margin-top: 10px;
+  letter-spacing: 2px;
+}
+
+.header-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 24px 0 0;
+}
+
+.hdline {
+  flex: 1;
+  max-width: 140px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(126,184,154,0.3), transparent);
+}
+
+.hddot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.5;
+}
+
+/* ── NOW PLAYING BAR ── */
+.now-playing {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(10,15,10,0.92);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.now-playing.visible { transform: translateY(0); }
+
+.np-wave {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.np-bar {
+  width: 3px;
+  background: var(--accent);
+  border-radius: 2px;
+  animation: waveBar 0.8s ease-in-out infinite alternate;
+}
+
+.np-bar:nth-child(1) { height: 14px; animation-delay: 0s; }
+.np-bar:nth-child(2) { height: 20px; animation-delay: 0.15s; }
+.np-bar:nth-child(3) { height: 10px; animation-delay: 0.3s; }
+.np-bar:nth-child(4) { height: 18px; animation-delay: 0.1s; }
+.np-bar:nth-child(5) { height: 12px; animation-delay: 0.25s; }
+
+@keyframes waveBar {
+  from { transform: scaleY(0.4); }
+  to   { transform: scaleY(1); }
+}
+
+.np-info { flex: 1; }
+
+.np-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1;
+}
+
+.np-sub {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+.np-stop {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.np-stop:hover { border-color: rgba(126,184,154,0.4); color: var(--accent); }
+
+/* ── FEATURED PANEL ── */
+.featured-panel {
+  display: none;
+  margin-bottom: 3px;
+  overflow: hidden;
+}
+
+.featured-panel.visible {
+  display: flex;
+  animation: featuredIn 0.45s cubic-bezier(0.4,0,0.2,1) both;
+}
+
+@keyframes featuredIn {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.featured-inner {
+  display: flex;
+  width: 100%;
+  border: 1px solid rgba(126,184,154,0.35);
+  border-top: 3px solid var(--accent);
+  background: rgba(126,184,154,0.04);
+  overflow: hidden;
+}
+
+.featured-left {
+  flex-shrink: 0;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 20px;
+  border-right: 1px solid var(--border);
+  background: rgba(0,0,0,0.2);
+}
+
+.featured-emoji {
+  font-size: 66px;
+  line-height: 1;
+  filter: drop-shadow(0 0 24px rgba(126,184,154,0.5));
+  animation: birdFloat 3s ease-in-out infinite;
+}
+
+@keyframes birdFloat {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px); }
+}
+
+.featured-bird-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-top: 12px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.featured-bird-hindi {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 3px;
+  text-align: center;
+}
+
+.featured-habitat {
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(126,184,154,0.4);
+  margin-top: 7px;
+}
+
+.featured-right {
+  flex: 1;
+  padding: 28px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+.featured-label {
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(126,184,154,0.4);
+}
+
+.featured-fact {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(15px, 2vw, 19px);
+  line-height: 1.7;
+  color: rgba(232,224,212,0.8);
+  font-style: italic;
+}
+
+.featured-scientific {
+  font-size: 11px;
+  color: rgba(232,224,212,0.2);
+  letter-spacing: 1px;
+  font-style: italic;
+}
+
+/* ── BIRD GRID ── */
+.grid-label {
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  animation: fadeUp 0.8s 0.1s ease both;
+}
+
+.birds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2px;
+  animation: fadeUp 0.8s 0.2s ease both;
+}
+
+/* ── BIRD CARD ── */
+.bird-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4/3;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.bird-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--card-bg, linear-gradient(135deg, #1a2a1a, #0d1a0d));
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+}
+
+.bird-card:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
+.bird-card:hover::before { transform: scale(1.05); }
+
+.bird-card.playing {
+  border-color: var(--accent);
+  box-shadow: 0 0 30px rgba(126,184,154,0.2), inset 0 0 30px rgba(126,184,154,0.05);
+}
+
+/* Bird emoji display */
+.bird-emoji-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.bird-card:hover .bird-emoji-wrap { transform: scale(1.1) translateY(-4px); }
+.bird-card.playing .bird-emoji-wrap { animation: birdBob 1s ease-in-out infinite; }
+
+@keyframes birdBob {
+  0%, 100% { transform: translateY(0) scale(1.1); }
+  50% { transform: translateY(-8px) scale(1.15); }
+}
+
+.bird-emoji {
+  font-size: 64px;
+  filter: drop-shadow(0 4px 20px rgba(0,0,0,0.5));
+  line-height: 1;
+}
+
+/* Habitat tag */
+.habitat-tag {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  background: rgba(0,0,0,0.3);
+  padding: 4px 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Card info overlay */
+.bird-info {
+  position: relative;
+  z-index: 2;
+  padding: 16px 20px 18px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0.9));
+}
+
+.bird-common {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1;
+}
+
+.bird-hindi {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  margin-top: 2px;
+}
+
+.bird-scientific {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.3);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.play-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: all 0.2s ease;
+}
+
+.bird-card:hover .play-indicator,
+.bird-card.playing .play-indicator {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.play-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: none;
+}
+
+.bird-card.playing .play-dot { animation: pulse 1s ease infinite; }
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+.play-text {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* ── FACT PANEL ── */
+.fact-panel {
+  margin-top: 2px;
+  padding: 28px 32px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.4s ease;
+  animation: fadeUp 0.8s 0.3s ease both;
+}
+
+.fact-panel.has-fact { border-color: rgba(126,184,154,0.2); }
+
+.fact-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 12px rgba(126,184,154,0.3));
+}
+
+.fact-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(15px, 2vw, 18px);
+  color: var(--muted);
+  line-height: 1.6;
+  transition: all 0.3s ease;
+}
+
+.fact-text.loaded {
+  color: rgba(232,224,212,0.75);
+  animation: fadeUp 0.4s ease both;
+}
+
+/* ── FOOTER ── */
+footer {
+  margin-top: 60px;
+  text-align: center;
+  padding-top: 30px;
+  border-top: 1px solid var(--border);
+  animation: fadeUp 0.8s 0.4s ease both;
+}
+
+.footer-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 14px;
+  color: rgba(232,224,212,0.2);
+  letter-spacing: 1px;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── MOBILE ── */
+@media (max-width: 600px) {
+  .birds-grid { grid-template-columns: repeat(2, 1fr); }
+  .bird-emoji { font-size: 44px; }
+  .bird-common { font-size: 16px; }
+  .now-playing { padding: 12px 16px; }
+  .np-name { font-size: 15px; }
+  .featured-inner { flex-direction: column; }
+  .featured-left { width: 100%; flex-direction: row; gap: 16px; padding: 16px 18px; border-right: none; border-bottom: 1px solid var(--border); }
+  .featured-emoji { font-size: 44px; }
+  .featured-bird-name { font-size: 16px; text-align: left; margin-top: 0; }
+  .featured-bird-hindi { text-align: left; }
+  .featured-habitat { margin-top: 3px; }
+  .featured-right { padding: 16px 18px; }
+  .featured-fact { font-size: 14px; }
+}
+
+@media (max-width: 380px) {
+  .birds-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- Background layers -->
+<div class="bg-layer bg-default"></div>
+<div class="bg-layer bg-active" id="bgActive"></div>
+<div class="particles" id="particles"></div>
+<div class="ripple-container" id="rippleContainer"></div>
+
+<!-- Flying bird silhouettes -->
+<svg class="bird-silhouette" id="flyingSilhouette" style="top:15%; --flydip:-20px; animation-duration:18s;" viewBox="0 0 80 40" width="80" fill="white" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0 20 Q10 8 20 20 Q30 8 40 20 M40 20 Q50 8 60 20 Q70 8 80 20" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>
+<svg class="bird-silhouette" id="flyingSilhouette2" style="top:35%; --flydip:15px; animation-duration:24s; animation-delay:-8s;" viewBox="0 0 60 30" width="50" fill="white" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0 15 Q7.5 6 15 15 Q22.5 6 30 15 M30 15 Q37.5 6 45 15 Q52.5 6 60 15" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-eyebrow">Indian Bird Sound Library</div>
+    <h1 class="header-title">पक्षी<br/><em>Pakshi</em></h1>
+    <div class="header-hindi">The voices of Indian birds</div>
+    <div class="header-divider">
+      <div class="hdline"></div>
+      <div class="hddot"></div>
+      <div class="hdline"></div>
+    </div>
+  </header>
+
+  <!-- FEATURED PANEL — appears when bird is tapped -->
+  <div class="featured-panel" id="featuredPanel">
+    <div class="featured-inner">
+      <div class="featured-left">
+        <div class="featured-emoji" id="featuredEmoji">🐦</div>
+        <div class="featured-bird-name" id="featuredName">—</div>
+        <div class="featured-bird-hindi" id="featuredHindi">—</div>
+        <div class="featured-habitat" id="featuredHabitat">—</div>
+      </div>
+      <div class="featured-right">
+        <div class="featured-label">◆ Did you know</div>
+        <div class="featured-fact" id="featuredFact">—</div>
+        <div class="featured-scientific" id="featuredScientific">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRID -->
+  <div class="grid-label">◆ Tap a bird to hear its call</div>
+  <div class="birds-grid" id="birdsGrid"></div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-text">"In every walk with nature, one receives far more than he seeks." — John Muir</div>
+  </footer>
+
+</div>
+
+<!-- NOW PLAYING BAR -->
+<div class="now-playing" id="nowPlaying">
+  <div class="np-wave">
+    <div class="np-bar"></div>
+    <div class="np-bar"></div>
+    <div class="np-bar"></div>
+    <div class="np-bar"></div>
+    <div class="np-bar"></div>
+  </div>
+  <div class="np-info">
+    <div class="np-name" id="npName">—</div>
+    <div class="np-sub" id="npSub">Now playing</div>
+  </div>
+  <button class="np-stop" onclick="stopAll()">■ Stop</button>
+</div>
+
+<script>
+// ── BIRD DATA ──
+const BIRDS = [
+  {
+    id: 'koel',
+    common: 'Asian Koel',
+    hindi: 'कोयल (Koyal)',
+    scientific: 'Eudynamys scolopaceus',
+    emoji: '🐦',
+    habitat: 'Woodland',
+    fact: 'The Koel\'s haunting call is associated with spring and new beginnings in Indian poetry. Only the male sings — the female stays silent.',
+    sound: 'https://upload.wikimedia.org/wikipedia/commons/4/4c/Eudynamys_scolopaceus_-_Koels_calling.ogg',
+    bg: 'linear-gradient(160deg, #0a1f0a 0%, #1a3d1a 40%, #0d2a1a 100%)',
+    bgGlow: 'rgba(30,100,30,0.35)',
+    particleColor: '#4CAF50',
+    cardBg: 'linear-gradient(135deg, #1a3d1a, #0a1f0a)',
+  },
+  {
+    id: 'peacock',
+    common: 'Indian Peacock',
+    hindi: 'मोर (Mor)',
+    scientific: 'Pavo cristatus',
+    emoji: '🦚',
+    habitat: 'Forest & Farm',
+    fact: 'India\'s national bird. The peacock\'s dramatic call signals the arrival of monsoon rains. A single train can have over 200 iridescent feathers.',
+    sound: 'https://upload.wikimedia.org/wikipedia/commons/6/6e/Pavo_cristatus_-_Indian_Peafowl_XC75461.ogg',
+    bg: 'linear-gradient(160deg, #0a0f1f 0%, #1a1f3d 40%, #0d1a2a 100%)',
+    bgGlow: 'rgba(30,50,150,0.3)',
+    particleColor: '#3F51B5',
+    cardBg: 'linear-gradient(135deg, #1a1f3d, #0a0f1f)',
+  },
+  {
+    id: 'mynah',
+    common: 'Common Myna',
+    hindi: 'मैना (Maina)',
+    scientific: 'Acridotheres tristis',
+    emoji: '🐤',
+    habitat: 'Urban & Rural',
+    fact: 'The Myna is one of the most intelligent birds and can mimic human speech. In Hindu mythology, it is considered auspicious to see a pair together.',
+    sound: 'https://upload.wikimedia.org/wikipedia/commons/d/d5/Acridotheres_tristis_-_Common_Myna_XC19762.ogg',
+    bg: 'linear-gradient(160deg, #1a1000 0%, #3d2800 40%, #2a1a00 100%)',
+    bgGlow: 'rgba(150,100,0,0.3)',
+    particleColor: '#FF9800',
+    cardBg: 'linear-gradient(135deg, #3d2800, #1a1000)',
+  },
+  {
+    id: 'sparrow',
+    common: 'House Sparrow',
+    hindi: 'गौरैया (Gauraiya)',
+    scientific: 'Passer domesticus',
+    emoji: '🐦',
+    habitat: 'Urban',
+    fact: 'Once the most common city bird in India, the house sparrow has declined sharply. March 20th is World Sparrow Day — started by a Mumbai naturalist.',
+    sound: 'https://upload.wikimedia.org/wikipedia/commons/d/d6/Passer_domesticus_-_House_Sparrow_XC35232.ogg',
+    bg: 'linear-gradient(160deg, #1a1208 0%, #2e2010 40%, #1a1208 100%)',
+    bgGlow: 'rgba(120,80,30,0.3)',
+    particleColor: '#A1887F',
+    cardBg: 'linear-gradient(135deg, #2e2010, #1a1208)',
+  },
+  {
+    id: 'kingfisher',
+    common: 'Common Kingfisher',
+    hindi: 'राम चिरैया',
+    scientific: 'Alcedo atthis',
+    emoji: '🦜',
+    habitat: 'Riverbank',
+    fact: 'A flash of electric blue along rivers and streams. The kingfisher dives at 40 km/h to catch fish with pinpoint accuracy — its beak inspired the shape of Japan\'s bullet train.',
+    sound: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Alcedo_atthis_-_Common_Kingfisher_XC27035.ogg',
+    bg: 'linear-gradient(160deg, #001a2a 0%, #003d5c 40%, #001f3a 100%)',
+    bgGlow: 'rgba(0,100,200,0.35)',
+    particleColor: '#03A9F4',
+    cardBg: 'linear-gradient(135deg, #003d5c, #001a2a)',
+  },
+  {
+    id: 'owl',
+    common: 'Indian Scops Owl',
+    hindi: 'उल्लू (Ullu)',
+    scientific: 'Otus bakkamoena',
+    emoji: '🦉',
+    habitat: 'Night Forest',
+    fact: 'The owl can rotate its head 270 degrees. In Indian villages its call at night is considered mystical. It is the vahana (vehicle) of Goddess Lakshmi.',
+    sound: 'https://upload.wikimedia.org/wikipedia/commons/7/74/Otus_bakkamoena_-_Collared_Scops_Owl_XC45561.ogg',
+    bg: 'linear-gradient(160deg, #050510 0%, #0a0a20 40%, #080814 100%)',
+    bgGlow: 'rgba(80,0,180,0.25)',
+    particleColor: '#9C27B0',
+    cardBg: 'linear-gradient(135deg, #0a0a20, #050510)',
+  },
+  {
+    id: 'flamingo',
+    common: 'Greater Flamingo',
+    hindi: 'राजहंस',
+    scientific: 'Phoenicopterus roseus',
+    emoji: '🦩',
+    habitat: 'Wetlands',
+    fact: 'Every winter, over a million flamingos descend on Mumbai\'s Thane Creek — one of the world\'s great wildlife spectacles. They are pink because of the algae they eat.',
+    sound: 'https://upload.wikimedia.org/wikipedia/commons/0/04/Phoenicopterus_ruber_ruber_-_Greater_Flamingo_XC24568.ogg',
+    bg: 'linear-gradient(160deg, #1a0a10 0%, #3d1a28 40%, #2a0f1a 100%)',
+    bgGlow: 'rgba(220,80,120,0.3)',
+    particleColor: '#E91E63',
+    cardBg: 'linear-gradient(135deg, #3d1a28, #1a0a10)',
+  },
+  {
+    id: 'eagle',
+    common: 'Crested Serpent Eagle',
+    hindi: 'बाज (Baaz)',
+    scientific: 'Spilornis cheela',
+    emoji: '🦅',
+    habitat: 'Dense Forest',
+    fact: 'India\'s national emblem features Garuda, inspired by the eagle. The Crested Serpent Eagle specializes in hunting snakes and is found in forests across India.',
+    sound: 'https://upload.wikimedia.org/wikipedia/commons/b/b8/Spilornis_cheela_-_Crested_Serpent_Eagle_XC33621.ogg',
+    bg: 'linear-gradient(160deg, #100800 0%, #2a1800 40%, #1a1000 100%)',
+    bgGlow: 'rgba(180,100,0,0.3)',
+    particleColor: '#FF6F00',
+    cardBg: 'linear-gradient(135deg, #2a1800, #100800)',
+  },
+  {
+    id: 'crane',
+    common: 'Sarus Crane',
+    hindi: 'सारस (Saras)',
+    scientific: 'Antigone antigone',
+    emoji: '🕊️',
+    habitat: 'Wetland & Field',
+    fact: 'The world\'s tallest flying bird at 180cm. Sarus cranes mate for life — if one dies, the other reportedly mourns. Valmiki wrote the Ramayana after witnessing a crane\'s grief.',
+    sound: 'https://upload.wikimedia.org/wikipedia/commons/e/e9/Grus_antigone_-_Sarus_Crane_XC45062.ogg',
+    bg: 'linear-gradient(160deg, #0a1a0a 0%, #1a3a0a 40%, #0f2a0f 100%)',
+    bgGlow: 'rgba(100,180,50,0.25)',
+    particleColor: '#8BC34A',
+    cardBg: 'linear-gradient(135deg, #1a3a0a, #0a1a0a)',
+  },
+  {
+    id: 'hornbill',
+    common: 'Great Hornbill',
+    hindi: 'धनेश (Dhanesh)',
+    scientific: 'Buceros bicornis',
+    emoji: '🦜',
+    habitat: 'Tropical Forest',
+    fact: 'The hornbill\'s spectacular casque (the yellow structure on its beak) is hollow and resonates its loud calls through the forest. It is the state bird of Kerala and Arunachal Pradesh.',
+    sound: 'https://upload.wikimedia.org/wikipedia/commons/4/4c/Buceros_bicornis_-_Great_Hornbill_XC60938.ogg',
+    bg: 'linear-gradient(160deg, #001a00 0%, #003300 40%, #001a08 100%)',
+    bgGlow: 'rgba(0,150,50,0.3)',
+    particleColor: '#FFEB3B',
+    cardBg: 'linear-gradient(135deg, #003300, #001a00)',
+  },
+  {
+    id: 'sunbird',
+    common: 'Purple Sunbird',
+    hindi: 'शक्कर खोरा',
+    scientific: 'Cinnyris asiaticus',
+    emoji: '🐦',
+    habitat: 'Garden & Grove',
+    fact: 'India\'s answer to the hummingbird. The male is an iridescent deep purple that shimmers in sunlight. It hovers to drink nectar and is a key pollinator of Indian flowers.',
+    sound: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Cinnyris_asiaticus_-_Purple_Sunbird_XC21823.ogg',
+    bg: 'linear-gradient(160deg, #0f001f 0%, #1f003f 40%, #180030 100%)',
+    bgGlow: 'rgba(120,0,200,0.3)',
+    particleColor: '#7B1FA2',
+    cardBg: 'linear-gradient(135deg, #1f003f, #0f001f)',
+  },
+  {
+    id: 'bulbul',
+    common: 'Red-whiskered Bulbul',
+    hindi: 'बुलबुल (Bulbul)',
+    scientific: 'Pycnonotus jocosus',
+    emoji: '🐤',
+    habitat: 'Garden & Scrub',
+    fact: 'The bulbul is the poet\'s bird of India — its melodious song inspired centuries of Urdu and Persian poetry. In legend, the bulbul\'s love for the rose is a metaphor for the soul\'s longing for the divine.',
+    sound: 'https://upload.wikimedia.org/wikipedia/commons/e/e9/Pycnonotus_jocosus_-_Red-whiskered_Bulbul_XC24476.ogg',
+    bg: 'linear-gradient(160deg, #1a0800 0%, #3d1800 40%, #2a1000 100%)',
+    bgGlow: 'rgba(200,80,0,0.3)',
+    particleColor: '#FF5722',
+    cardBg: 'linear-gradient(135deg, #3d1800, #1a0800)',
+  },
+];
+
+// ── STATE ──
+let currentAudio = null;
+let currentBirdId = null;
+
+// ── RENDER GRID ──
+function renderGrid() {
+  const grid = document.getElementById('birdsGrid');
+  grid.innerHTML = BIRDS.map(bird => `
+    <div class="bird-card" id="card-${bird.id}" onclick="playBird('${bird.id}')"
+         style="--card-bg: ${bird.cardBg}">
+      <div class="habitat-tag">${bird.habitat}</div>
+      <div class="bird-emoji-wrap">
+        <div class="bird-emoji">${bird.emoji}</div>
+      </div>
+      <div class="bird-info">
+        <div class="bird-common">${bird.common}</div>
+        <div class="bird-hindi">${bird.hindi}</div>
+        <div class="bird-scientific">${bird.scientific}</div>
+        <div class="play-indicator">
+          <div class="play-dot"></div>
+          <div class="play-text" id="playtxt-${bird.id}">Tap to play</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── PLAY BIRD ──
+function playBird(id) {
+  const bird = BIRDS.find(b => b.id === id);
+  if (!bird) return;
+
+  // Stop current
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+  }
+
+  // Reset all cards
+  document.querySelectorAll('.bird-card').forEach(c => c.classList.remove('playing'));
+  document.querySelectorAll('[id^="playtxt-"]').forEach(t => t.textContent = 'Tap to play');
+  document.querySelectorAll('.bird-silhouette').forEach(s => s.classList.remove('active'));
+
+  if (currentBirdId === id && !currentAudio?.paused) {
+    stopAll();
+    return;
+  }
+
+  currentBirdId = id;
+
+  // Play audio
+  currentAudio = new Audio(bird.sound);
+  currentAudio.play().catch(() => {
+    // Audio blocked — still show UI
+  });
+
+  currentAudio.onended = () => {
+    stopAll();
+  };
+
+  // Update card
+  const card = document.getElementById(`card-${id}`);
+  card.classList.add('playing');
+  document.getElementById(`playtxt-${id}`).textContent = 'Now playing...';
+
+  // Update now playing bar
+  document.getElementById('npName').textContent = bird.common;
+  document.getElementById('npSub').textContent = bird.hindi + ' · ' + bird.habitat;
+  document.getElementById('nowPlaying').classList.add('visible');
+
+  // Update background
+  updateBackground(bird);
+
+  // Update fact
+  updateFact(bird);
+
+  // Spawn ripple
+  spawnRipple(card);
+
+  // Activate flying silhouettes
+  document.querySelectorAll('.bird-silhouette').forEach(s => s.classList.add('active'));
+}
+
+// ── STOP ALL ──
+function stopAll() {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+  currentBirdId = null;
+  document.querySelectorAll('.bird-card').forEach(c => c.classList.remove('playing'));
+  document.querySelectorAll('[id^="playtxt-"]').forEach(t => t.textContent = 'Tap to play');
+  document.getElementById('nowPlaying').classList.remove('visible');
+  document.querySelectorAll('.bird-silhouette').forEach(s => s.classList.remove('active'));
+
+  // Hide featured panel
+  document.getElementById('featuredPanel').classList.remove('visible');
+
+  // Reset background
+  const bgActive = document.getElementById('bgActive');
+  bgActive.style.opacity = '0';
+  setTimeout(() => { bgActive.style.background = ''; }, 1200);
+}
+
+// ── BACKGROUND ──
+function updateBackground(bird) {
+  const bgActive = document.getElementById('bgActive');
+
+  bgActive.style.background = `
+    ${bird.bg},
+    radial-gradient(ellipse at 30% 40%, ${bird.bgGlow} 0%, transparent 55%),
+    radial-gradient(ellipse at 70% 70%, ${bird.bgGlow.replace('0.3', '0.15')} 0%, transparent 50%)
+  `;
+  bgActive.style.opacity = '1';
+
+  // Spawn particles in bird's color
+  spawnParticles(bird.particleColor);
+}
+
+// ── PARTICLES ──
+function spawnParticles(color) {
+  const container = document.getElementById('particles');
+  container.innerHTML = '';
+
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 4 + 2;
+    p.style.cssText = `
+      width: ${size}px;
+      height: ${size}px;
+      left: ${Math.random() * 100}%;
+      background: ${color};
+      opacity: 0.4;
+      --drift: ${(Math.random() - 0.5) * 200}px;
+      animation-duration: ${Math.random() * 8 + 6}s;
+      animation-delay: ${Math.random() * 4}s;
+      box-shadow: 0 0 ${size * 2}px ${color};
+    `;
+    container.appendChild(p);
+  }
+}
+
+// ── RIPPLE ──
+function spawnRipple(card) {
+  const container = document.getElementById('rippleContainer');
+  const rect = card.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+
+  for (let i = 0; i < 3; i++) {
+    setTimeout(() => {
+      const r = document.createElement('div');
+      r.className = 'ripple';
+      r.style.left = cx + 'px';
+      r.style.top = cy + 'px';
+      r.style.animationDelay = (i * 0.4) + 's';
+      container.appendChild(r);
+      setTimeout(() => r.remove(), 3500);
+    }, i * 300);
+  }
+}
+
+// ── FEATURED PANEL ──
+function updateFact(bird) {
+  const panel = document.getElementById('featuredPanel');
+
+  // Brief hide then show for re-animation
+  panel.classList.remove('visible');
+
+  setTimeout(() => {
+    document.getElementById('featuredEmoji').textContent = bird.emoji;
+    document.getElementById('featuredName').textContent = bird.common;
+    document.getElementById('featuredHindi').textContent = bird.hindi;
+    document.getElementById('featuredHabitat').textContent = bird.habitat;
+    document.getElementById('featuredFact').textContent = bird.fact;
+    document.getElementById('featuredScientific').textContent = bird.scientific;
+    panel.classList.add('visible');
+
+    // Scroll panel into view smoothly
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 80);
+}
+
+// ── INIT ──
+renderGrid();
+</script>
+</body>
+</html>
