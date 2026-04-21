@@ -143,78 +143,78 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 </div>
 
 <script>
-// ✅ WORKING SOUNDS - Updated April 2026 (Xeno-Canto direct MP3s)
+// Bird sounds are now loaded from local .wav files in the repo root (e.g. koel.wav).
 
 const BIRDS = [
   { id:'koel', common:'Asian Koel', hindi:'कोयल (Koyal)', scientific:'Eudynamys scolopaceus', emoji:'🐦', habitat:'Woodland',
     fact:"The Koel's haunting call is the sound of Indian spring. Only the male sings.", 
-    sound:'https://xeno-canto.org/331241/download',
+    sound:'koel.wav',
     bg:'linear-gradient(160deg,#0a1f0a 0%,#1a3d1a 40%,#0d2a1a 100%)', bgGlow:'rgba(30,100,30,0.35)', particleColor:'#4CAF50',
     cardBg:'linear-gradient(135deg,#1a3d1a,#0a1f0a)' },
 
   { id:'peacock', common:'Indian Peacock', hindi:'मोर (Mor)', scientific:'Pavo cristatus', emoji:'🦚', habitat:'Forest & Farm',
     fact:"India's national bird. The dramatic call signals the monsoon.", 
-    sound:'https://xeno-canto.org/21756/download',
+    sound:'peacock.wav',
     bg:'linear-gradient(160deg,#0a0f1f 0%,#1a1f3d 40%,#0d1a2a 100%)', bgGlow:'rgba(30,50,150,0.3)', particleColor:'#3F51B5',
     cardBg:'linear-gradient(135deg,#1a1f3d,#0a0f1f)' },
 
   { id:'mynah', common:'Common Myna', hindi:'मैना (Maina)', scientific:'Acridotheres tristis', emoji:'🐤', habitat:'Urban & Rural',
     fact:"One of the world's most intelligent birds — mimics human speech.", 
-    sound:'https://xeno-canto.org/102122/download',
+    sound:'mynah.wav',
     bg:'linear-gradient(160deg,#1a1000 0%,#3d2800 40%,#2a1a00 100%)', bgGlow:'rgba(150,100,0,0.3)', particleColor:'#FF9800',
     cardBg:'linear-gradient(135deg,#3d2800,#1a1000)' },
 
   { id:'sparrow', common:'House Sparrow', hindi:'गौरैया (Gauraiya)', scientific:'Passer domesticus', emoji:'🐦', habitat:'Urban',
     fact:"Once India's most common city bird, now declining due to mobile towers.", 
-    sound:'https://xeno-canto.org/35232/download',
+    sound:'sparrow.wav',
     bg:'linear-gradient(160deg,#1a1208 0%,#2e2010 40%,#1a1208 100%)', bgGlow:'rgba(120,80,30,0.3)', particleColor:'#A1887F',
     cardBg:'linear-gradient(135deg,#2e2010,#1a1208)' },
 
   { id:'kingfisher', common:'Common Kingfisher', hindi:'राम चिरैया', scientific:'Alcedo atthis', emoji:'🦜', habitat:'Riverbank',
     fact:"Dives at 40 km/h. Its beak inspired Japan's bullet train.", 
-    sound:'https://xeno-canto.org/27035/download',
+    sound:'kingfisher.wav',
     bg:'linear-gradient(160deg,#001a2a 0%,#003d5c 40%,#001f3a 100%)', bgGlow:'rgba(0,100,200,0.35)', particleColor:'#03A9F4',
     cardBg:'linear-gradient(135deg,#003d5c,#001a2a)' },
 
   { id:'owl', common:'Indian Scops Owl', hindi:'उल्लू (Ullu)', scientific:'Otus bakkamoena', emoji:'🦉', habitat:'Night Forest',
     fact:"Can rotate head 270°. Symbol of wisdom and Goddess Lakshmi.", 
-    sound:'https://xeno-canto.org/45561/download',
+    sound:'owl.wav',
     bg:'linear-gradient(160deg,#050510 0%,#0a0a20 40%,#080814 100%)', bgGlow:'rgba(80,0,180,0.25)', particleColor:'#9C27B0',
     cardBg:'linear-gradient(135deg,#0a0a20,#050510)' },
 
   { id:'flamingo', common:'Greater Flamingo', hindi:'राजहंस', scientific:'Phoenicopterus roseus', emoji:'🦩', habitat:'Wetlands',
     fact:"Pink colour comes from algae. Over a million visit Mumbai every winter.", 
-    sound:'https://xeno-canto.org/24568/download',
+    sound:'flamingo.wav',
     bg:'linear-gradient(160deg,#1a0a10 0%,#3d1a28 40%,#2a0f1a 100%)', bgGlow:'rgba(220,80,120,0.3)', particleColor:'#E91E63',
     cardBg:'linear-gradient(135deg,#3d1a28,#1a0a10)' },
 
   { id:'eagle', common:'Crested Serpent Eagle', hindi:'बाज (Baaz)', scientific:'Spilornis cheela', emoji:'🦅', habitat:'Dense Forest',
     fact:"Specialises in hunting snakes. Inspired Garuda in Indian emblem.", 
-    sound:'https://xeno-canto.org/33621/download',
+    sound:'eagle.wav',
     bg:'linear-gradient(160deg,#100800 0%,#2a1800 40%,#1a1000 100%)', bgGlow:'rgba(180,100,0,0.3)', particleColor:'#FF6F00',
     cardBg:'linear-gradient(135deg,#2a1800,#100800)' },
 
   { id:'crane', common:'Sarus Crane', hindi:'सारस (Saras)', scientific:'Antigone antigone', emoji:'🕊️', habitat:'Wetland & Field',
     fact:"World's tallest flying bird. Mate for life. Inspired first Sanskrit verse.", 
-    sound:'https://xeno-canto.org/45062/download',
+    sound:'crane.wav',
     bg:'linear-gradient(160deg,#0a1a0a 0%,#1a3a0a 40%,#0f2a0f 100%)', bgGlow:'rgba(100,180,50,0.25)', particleColor:'#8BC34A',
     cardBg:'linear-gradient(135deg,#1a3a0a,#0a1a0a)' },
 
   { id:'hornbill', common:'Great Hornbill', hindi:'धनेश (Dhanesh)', scientific:'Buceros bicornis', emoji:'🦜', habitat:'Tropical Forest',
     fact:"Hollow casque amplifies calls. State bird of Kerala & Arunachal.", 
-    sound:'https://xeno-canto.org/60938/download',
+    sound:'hornbill.wav',
     bg:'linear-gradient(160deg,#001a00 0%,#003300 40%,#001a08 100%)', bgGlow:'rgba(0,150,50,0.3)', particleColor:'#FFEB3B',
     cardBg:'linear-gradient(135deg,#003300,#001a00)' },
 
   { id:'sunbird', common:'Purple Sunbird', hindi:'शक्कर खोरा', scientific:'Cinnyris asiaticus', emoji:'🐦', habitat:'Garden & Grove',
     fact:"India's hummingbird. Important pollinator of garden flowers.", 
-    sound:'https://xeno-canto.org/21823/download',
+    sound:'sunbird.wav',
     bg:'linear-gradient(160deg,#0f001f 0%,#1f003f 40%,#180030 100%)', bgGlow:'rgba(120,0,200,0.3)', particleColor:'#7B1FA2',
     cardBg:'linear-gradient(135deg,#1f003f,#0f001f)' },
 
   { id:'bulbul', common:'Red-whiskered Bulbul', hindi:'बुलबुल (Bulbul)', scientific:'Pycnonotus jocosus', emoji:'🐤', habitat:'Garden & Scrub',
     fact:"Poet's bird of India. Symbol of soul's longing in Sufi poetry.", 
-    sound:'https://xeno-canto.org/24476/download',
+    sound:'bulbul.wav',
     bg:'linear-gradient(160deg,#1a0800 0%,#3d1800 40%,#2a1000 100%)', bgGlow:'rgba(200,80,0,0.3)', particleColor:'#FF5722',
     cardBg:'linear-gradient(135deg,#3d1800,#1a0800)' }
 ];
@@ -224,7 +224,7 @@ let currentBirdId = null;
 
 function renderGrid() {
   document.getElementById('birdsGrid').innerHTML = BIRDS.map(b => `
-    <div class="bird-card" id="card-\( {b.id}" onclick="playBird(' \){b.id}')" style="--card-bg:${b.cardBg}">
+    <div class="bird-card" id="card-${b.id}" onclick="playBird('${b.id}')" style="--card-bg:${b.cardBg}">
       <div class="habitat-tag">${b.habitat}</div>
       <div class="bird-emoji-wrap"><div class="bird-emoji">${b.emoji}</div></div>
       <div class="bird-info">
@@ -290,7 +290,7 @@ function stopAll() {
 
 function updateBackground(bird) {
   const bg = document.getElementById('bgActive');
-  bg.style.background = `\( {bird.bg},radial-gradient(ellipse at 30% 40%, \){bird.bgGlow} 0%,transparent 55%)`;
+  bg.style.background = `${bird.bg},radial-gradient(ellipse at 30% 40%, ${bird.bgGlow} 0%,transparent 55%)`;
   bg.style.opacity = '1';
   spawnParticles(bird.particleColor);
 }
@@ -302,7 +302,7 @@ function spawnParticles(color) {
     const p = document.createElement('div');
     p.className = 'particle';
     const s = Math.random()*4+2;
-    p.style.cssText = `width:\( {s}px;height: \){s}px;left:\( {Math.random()*100}%;background: \){color};--drift:\( {(Math.random()-0.5)*200}px;animation-duration: \){Math.random()*8+6}s;animation-delay:${Math.random()*4}s;`;
+    p.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;background:${color};--drift:${(Math.random()-0.5)*200}px;animation-duration:${Math.random()*8+6}s;animation-delay:${Math.random()*4}s;`;
     c.appendChild(p);
   }
 }
