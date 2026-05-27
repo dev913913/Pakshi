@@ -392,6 +392,10 @@ function fisherYatesShuffle(items) {
 
 function playNextMixBird() {
   if (!mixModeActive) return;
+  if (BIRDS.length === 0) {
+    stopMixMode();
+    return;
+  }
   if (!mixQueue.length) {
     mixQueue = fisherYatesShuffle(BIRDS.map(b => b.id));
   }
