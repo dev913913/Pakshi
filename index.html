@@ -288,13 +288,13 @@ function playBird(id) {
     audio.play();
   }, { once: true });
 
-  audio.addEventListener('ended', () => {
+audio.addEventListener('ended', () => {
     if (mixModeActive) {
       playNextMixBird();
       return;
     }
     stopAll();
-  });
+  }, { once: true });
   audio.addEventListener('error', () => {
     card.classList.remove('loading-sound');
     alert("Sorry, sound failed to load for " + bird.common);
