@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Pakshi — Indian Bird Sound Library</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
-<style> 
+<style>
 :root {
   --bg: #0d1117; --text: #e8e0d4; --muted: rgba(232,224,212,0.45);
   --card: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08);
@@ -37,17 +37,6 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .header-divider{display:flex;align-items:center;justify-content:center;gap:16px;margin:24px 0 0;}
 .hdline{flex:1;max-width:140px;height:1px;background:linear-gradient(90deg,transparent,rgba(126,184,154,0.3),transparent);}
 .hddot{width:4px;height:4px;border-radius:50%;background:var(--accent);opacity:0.5;}
-
-/* --- Rain ambient toggle --- */
-.rain-toggle{position:fixed;top:20px;right:20px;z-index:101;background:rgba(255,255,255,0.04);
-  border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;
-  letter-spacing:1px;padding:9px 16px;cursor:pointer;transition:all 0.3s ease;border-radius:20px;
-  display:flex;align-items:center;gap:6px;backdrop-filter:blur(8px);}
-.rain-toggle:hover{border-color:rgba(126,184,154,0.3);color:var(--text);}
-.rain-toggle.active{border-color:var(--accent);color:var(--accent);background:rgba(126,184,154,0.1);}
-.rain-toggle .rain-icon{font-size:14px;}
-@media(max-width:600px){.rain-toggle{top:14px;right:14px;padding:8px 12px;font-size:11px;}}
-
 .now-playing{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(10,15,10,0.94);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;gap:16px;transform:translateY(100%);transition:transform 0.4s cubic-bezier(0.4,0,0.2,1);}
 .now-playing.visible{transform:translateY(0);}
 .np-wave{display:flex;align-items:center;gap:3px;flex-shrink:0;}
@@ -117,10 +106,6 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 <svg class="bird-silhouette" style="top:15%;--flydip:-20px;animation-duration:18s;" viewBox="0 0 80 40" width="80" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 20 Q10 8 20 20 Q30 8 40 20 M40 20 Q50 8 60 20 Q70 8 80 20" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
 <svg class="bird-silhouette" style="top:35%;--flydip:15px;animation-duration:24s;animation-delay:-8s;" viewBox="0 0 60 30" width="50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 15 Q7.5 6 15 15 Q22.5 6 30 15 M30 15 Q37.5 6 45 15 Q52.5 6 60 15" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
 
-<button class="rain-toggle" id="rainToggle" onclick="toggleRain()" aria-label="Toggle rain ambience">
-  <span class="rain-icon">🌧️</span><span id="rainLabel">Rain</span>
-</button>
-
 <div class="wrap">
   <header>
     <div class="header-eyebrow">Indian Bird Sound Library</div>
@@ -159,7 +144,6 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 
 <script>
 // Bird sounds are loaded from the assets folder (e.g. assets/koel.mp3).
-// Rain ambience is loaded from assets/rain.mp3 — add that file to the assets folder.
 
 const BIRDS = [
   { id:'koel', common:'Asian Koel', hindi:'कोयल (Koyal)', scientific:'Eudynamys scolopaceus', emoji:'🐦', habitat:'Woodland',
@@ -238,51 +222,6 @@ const BIRDS = [
 let currentAudio = null;
 let currentBirdId = null;
 
-// --- Rain ambience state (independent of bird playback) ---
-let rainAudio = null;
-let rainOn = false;
-
-function toggleRain() {
-  const btn = document.getElementById('rainToggle');
-
-  if (!rainOn) {
-    if (!rainAudio) {
-      rainAudio = new Audio('assets/rain.mp3');
-      rainAudio.loop = true;
-      rainAudio.volume = 0;
-      rainAudio.addEventListener('error', () => {
-        alert("Sorry, rain sound couldn't be loaded. Make sure assets/rain.mp3 exists.");
-        rainOn = false;
-        btn.classList.remove('active');
-      });
-    }
-    rainAudio.play().catch(() => {
-      // Autoplay was blocked — this shouldn't normally happen since this runs from a click.
-    });
-    fadeAudio(rainAudio, rainAudio.volume, 0.35, 800);
-    rainOn = true;
-    btn.classList.add('active');
-  } else {
-    fadeAudio(rainAudio, rainAudio.volume, 0, 600, () => rainAudio.pause());
-    rainOn = false;
-    btn.classList.remove('active');
-  }
-}
-
-function fadeAudio(audio, from, to, duration, onDone) {
-  const steps = 20;
-  const stepTime = duration / steps;
-  let i = 0;
-  const interval = setInterval(() => {
-    i++;
-    audio.volume = Math.max(0, Math.min(1, from + (to - from) * (i / steps)));
-    if (i >= steps) {
-      clearInterval(interval);
-      if (onDone) onDone();
-    }
-  }, stepTime);
-}
-
 function renderGrid() {
   document.getElementById('birdsGrid').innerHTML = BIRDS.map(b => `
     <div class="bird-card" id="card-${b.id}" onclick="playBird('${b.id}')" style="--card-bg:${b.cardBg}">
@@ -339,7 +278,6 @@ function playBird(id) {
 }
 
 function stopAll() {
-  // Note: this intentionally does NOT touch rainAudio — rain is independent ambience.
   if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; }
   currentBirdId = null;
   document.querySelectorAll('.bird-card').forEach(c => c.classList.remove('playing','loading-sound'));
