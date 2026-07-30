@@ -28,6 +28,8 @@ body::before{content:'';position:fixed;inset:-50%;background:repeating-conic-gra
 .ripple-container{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
 .ripple{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,0.15);animation:rippleOut 3s ease-out forwards;transform:translate(-50%,-50%);}
 @keyframes rippleOut{0%{width:0;height:0;opacity:0.8;}100%{width:600px;height:600px;opacity:0;}}
+.rain-layer{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity 1s ease;}
+.rain-layer.visible{opacity:0.5;}
 .wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px 100px;}
 header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .header-eyebrow{font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:6px;color:var(--muted);text-transform:uppercase;margin-bottom:16px;}
@@ -103,6 +105,7 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 <div class="bg-layer bg-active" id="bgActive"></div>
 <div class="particles" id="particles"></div>
 <div class="ripple-container" id="rippleContainer"></div>
+<canvas class="rain-layer" id="rainCanvas"></canvas>
 <svg class="bird-silhouette" style="top:15%;--flydip:-20px;animation-duration:18s;" viewBox="0 0 80 40" width="80" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 20 Q10 8 20 20 Q30 8 40 20 M40 20 Q50 8 60 20 Q70 8 80 20" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
 <svg class="bird-silhouette" style="top:35%;--flydip:15px;animation-duration:24s;animation-delay:-8s;" viewBox="0 0 60 30" width="50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 15 Q7.5 6 15 15 Q22.5 6 30 15 M30 15 Q37.5 6 45 15 Q52.5 6 60 15" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
 
@@ -156,7 +159,7 @@ const BIRDS = [
     fact:"India's national bird. The dramatic call signals the monsoon.",
     sound:'assets/peacock.mp3',
     bg:'linear-gradient(160deg,#0a0f1f 0%,#1a1f3d 40%,#0d1a2a 100%)', bgGlow:'rgba(30,50,150,0.3)', particleColor:'#3F51B5',
-    cardBg:'linear-gradient(135deg,#1a1f3d,#0a0f1f)' },
+    cardBg:'linear-gradient(135deg,#1a1f3d,#0a0f1f)', rain:true },
 
   { id:'mynah', common:'Common Myna', hindi:'मैना (Maina)', scientific:'Acridotheres tristis', emoji:'🐤', habitat:'Urban & Rural',
     fact:"One of the world's most intelligent birds — mimics human speech.",
@@ -174,7 +177,7 @@ const BIRDS = [
     fact:"Dives at 40 km/h. Its beak inspired Japan's bullet train.",
     sound:'assets/kingfisher.mp3',
     bg:'linear-gradient(160deg,#001a2a 0%,#003d5c 40%,#001f3a 100%)', bgGlow:'rgba(0,100,200,0.35)', particleColor:'#03A9F4',
-    cardBg:'linear-gradient(135deg,#003d5c,#001a2a)' },
+    cardBg:'linear-gradient(135deg,#003d5c,#001a2a)', rain:true },
 
   { id:'owl', common:'Indian Scops Owl', hindi:'उल्लू (Ullu)', scientific:'Otus bakkamoena', emoji:'🦉', habitat:'Night Forest',
     fact:"Can rotate head 270°. Symbol of wisdom and Goddess Lakshmi.",
@@ -198,13 +201,13 @@ const BIRDS = [
     fact:"World's tallest flying bird. Mate for life. Inspired first Sanskrit verse.",
     sound:'assets/crane.mp3',
     bg:'linear-gradient(160deg,#0a1a0a 0%,#1a3a0a 40%,#0f2a0f 100%)', bgGlow:'rgba(100,180,50,0.25)', particleColor:'#8BC34A',
-    cardBg:'linear-gradient(135deg,#1a3a0a,#0a1a0a)' },
+    cardBg:'linear-gradient(135deg,#1a3a0a,#0a1a0a)', rain:true },
 
   { id:'hornbill', common:'Great Hornbill', hindi:'धनेश (Dhanesh)', scientific:'Buceros bicornis', emoji:'🦜', habitat:'Tropical Forest',
     fact:"Hollow casque amplifies calls. State bird of Kerala & Arunachal.",
     sound:'assets/hornbill.mp3',
     bg:'linear-gradient(160deg,#001a00 0%,#003300 40%,#001a08 100%)', bgGlow:'rgba(0,150,50,0.3)', particleColor:'#FFEB3B',
-    cardBg:'linear-gradient(135deg,#003300,#001a00)' },
+    cardBg:'linear-gradient(135deg,#003300,#001a00)', rain:true },
 
   { id:'sunbird', common:'Purple Sunbird', hindi:'शक्कर खोरा', scientific:'Cinnyris asiaticus', emoji:'🐦', habitat:'Garden & Grove',
     fact:"India's hummingbird. Important pollinator of garden flowers.",
@@ -256,6 +259,7 @@ function playBird(id) {
   showFeatured(bird);
   updateBackground(bird);
   spawnRipple(card);
+  toggleRain(!!bird.rain);
   document.querySelectorAll('.bird-silhouette').forEach(s => s.classList.add('active'));
 
   const audio = new Audio(bird.sound);
@@ -286,6 +290,7 @@ function stopAll() {
   document.getElementById('featuredPanel').classList.remove('visible');
   document.querySelectorAll('.bird-silhouette').forEach(s => s.classList.remove('active'));
   document.getElementById('bgActive').style.opacity = '0';
+  toggleRain(false);
 }
 
 function updateBackground(bird) {
@@ -335,6 +340,74 @@ function showFeatured(bird) {
     document.getElementById('featuredScientific').textContent = bird.scientific;
     panel.classList.add('visible');
   }, 80);
+}
+
+// ---- Rain effect ----
+// Rain is shown automatically for birds marked rain:true above
+// (Peacock, Kingfisher, Sarus Crane, Great Hornbill — all monsoon/wetland/riverbank birds).
+// Toggle it for any bird by adding/removing `rain:true` in its BIRDS entry.
+const rainCanvas = document.getElementById('rainCanvas');
+const rainCtx = rainCanvas.getContext('2d');
+let raindrops = [];
+let rainRunning = false;
+let rainAnimId = null;
+
+function resizeRainCanvas() {
+  rainCanvas.width = window.innerWidth;
+  rainCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeRainCanvas);
+resizeRainCanvas();
+
+function createRaindrops(count = 150) {
+  raindrops = [];
+  for (let i = 0; i < count; i++) {
+    raindrops.push({
+      x: Math.random() * rainCanvas.width,
+      y: Math.random() * rainCanvas.height,
+      length: Math.random() * 18 + 10,
+      speed: Math.random() * 6 + 4,
+      opacity: Math.random() * 0.4 + 0.2
+    });
+  }
+}
+
+function drawRain() {
+  rainCtx.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
+  rainCtx.strokeStyle = 'rgba(174,194,224,0.6)';
+  rainCtx.lineWidth = 1;
+
+  raindrops.forEach(drop => {
+    rainCtx.globalAlpha = drop.opacity;
+    rainCtx.beginPath();
+    rainCtx.moveTo(drop.x, drop.y);
+    rainCtx.lineTo(drop.x, drop.y + drop.length);
+    rainCtx.stroke();
+
+    drop.y += drop.speed;
+    drop.x -= drop.speed * 0.3; // slight wind slant
+
+    if (drop.y > rainCanvas.height) {
+      drop.y = -drop.length;
+      drop.x = Math.random() * rainCanvas.width;
+    }
+  });
+
+  if (rainRunning) rainAnimId = requestAnimationFrame(drawRain);
+}
+
+function toggleRain(on) {
+  if (on && !rainRunning) {
+    rainRunning = true;
+    createRaindrops();
+    rainCanvas.classList.add('visible');
+    drawRain();
+  } else if (!on && rainRunning) {
+    rainRunning = false;
+    if (rainAnimId) cancelAnimationFrame(rainAnimId);
+    rainCanvas.classList.remove('visible');
+    setTimeout(() => rainCtx.clearRect(0, 0, rainCanvas.width, rainCanvas.height), 1000);
+  }
 }
 
 renderGrid();
