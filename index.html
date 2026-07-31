@@ -271,7 +271,7 @@ let ambientOn = {};     // id -> boolean
 
 function renderAmbience() {
   document.getElementById('ambienceButtons').innerHTML = AMBIENTS.map(a => `
-    <button class="ambience-btn" id="amb-btn-${a.id}" onclick="toggleAmbient('${a.id}')" aria-label="Toggle ${a.label} ambience">
+    <button class="ambience-btn" id="amb-btn-${a.id}" onclick="toggleAmbient('${a.id}')" aria-label="Toggle ${a.label} ambience" aria-pressed="false">
       <span class="amb-icon">${a.icon}</span><span>${a.label}</span>
     </button>`).join('');
 }
@@ -289,8 +289,11 @@ function toggleAmbient(id) {
       audio.volume = 0;
       audio.addEventListener('error', () => {
         alert("Sorry, " + conf.label + " sound couldn't be loaded. Make sure " + conf.file + " exists.");
+        audio.pause();
+        delete ambientAudios[id];
         ambientOn[id] = false;
         btn.classList.remove('active');
+        btn.setAttribute('aria-pressed', 'false');
       });
       ambientAudios[id] = audio;
     }
@@ -301,23 +304,27 @@ function toggleAmbient(id) {
     fadeAudio(audio, audio.volume, conf.volume, 800);
     ambientOn[id] = true;
     btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
   } else {
     const audio = ambientAudios[id];
     fadeAudio(audio, audio.volume, 0, 600, () => audio.pause());
     ambientOn[id] = false;
     btn.classList.remove('active');
+    btn.setAttribute('aria-pressed', 'false');
   }
 }
 
 function fadeAudio(audio, from, to, duration, onDone) {
+  if (audio._fadeInterval) clearInterval(audio._fadeInterval);
   const steps = 20;
   const stepTime = duration / steps;
   let i = 0;
-  const interval = setInterval(() => {
+  audio._fadeInterval = setInterval(() => {
     i++;
     audio.volume = Math.max(0, Math.min(1, from + (to - from) * (i / steps)));
     if (i >= steps) {
-      clearInterval(interval);
+      clearInterval(audio._fadeInterval);
+      audio._fadeInterval = null;
       if (onDone) onDone();
     }
   }, stepTime);
