@@ -38,15 +38,31 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .hdline{flex:1;max-width:140px;height:1px;background:linear-gradient(90deg,transparent,rgba(126,184,154,0.3),transparent);}
 .hddot{width:4px;height:4px;border-radius:50%;background:var(--accent);opacity:0.5;}
 
-/* --- Rain ambient toggle --- */
-.rain-toggle{position:fixed;top:20px;right:20px;z-index:101;background:rgba(255,255,255,0.04);
-  border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;
-  letter-spacing:1px;padding:9px 16px;cursor:pointer;transition:all 0.3s ease;border-radius:20px;
-  display:flex;align-items:center;gap:6px;backdrop-filter:blur(8px);}
-.rain-toggle:hover{border-color:rgba(126,184,154,0.3);color:var(--text);}
-.rain-toggle.active{border-color:var(--accent);color:var(--accent);background:rgba(126,184,154,0.1);}
-.rain-toggle .rain-icon{font-size:14px;}
-@media(max-width:600px){.rain-toggle{top:14px;right:14px;padding:8px 12px;font-size:11px;}}
+/* --- Ambience panel (rain / wind / water / bugs) --- */
+.ambience-panel{position:fixed;top:20px;right:20px;z-index:101;background:rgba(13,17,23,0.75);
+  backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:16px;
+  padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.35);}
+.ambience-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);
+  display:flex;align-items:center;gap:6px;}
+.ambience-label::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--accent);opacity:0.6;}
+.ambience-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.ambience-btn{display:flex;align-items:center;justify-content:center;gap:6px;
+  background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--muted);
+  font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.5px;padding:9px 12px;
+  border-radius:12px;cursor:pointer;transition:all 0.25s ease;white-space:nowrap;}
+.ambience-btn:hover{border-color:rgba(126,184,154,0.35);color:var(--text);background:rgba(255,255,255,0.06);}
+.ambience-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(126,184,154,0.12);
+  box-shadow:0 0 16px rgba(126,184,154,0.15);}
+.ambience-btn .amb-icon{font-size:14px;line-height:1;}
+.ambience-btn.active .amb-icon{animation:ambPulse 1.8s ease-in-out infinite;}
+@keyframes ambPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
+@media(max-width:600px){
+  .ambience-panel{top:12px;right:12px;left:12px;padding:12px 14px 14px;border-radius:14px;}
+  .ambience-buttons{grid-template-columns:repeat(4,1fr);gap:6px;}
+  .ambience-btn{flex-direction:column;padding:8px 4px;font-size:9px;gap:3px;}
+  .ambience-btn .amb-icon{font-size:16px;}
+}
 
 .now-playing{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(10,15,10,0.94);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;gap:16px;transform:translateY(100%);transition:transform 0.4s cubic-bezier(0.4,0,0.2,1);}
 .now-playing.visible{transform:translateY(0);}
@@ -99,6 +115,7 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 .footer-text{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:rgba(232,224,212,0.2);letter-spacing:1px;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 @media(max-width:600px){
+  header{padding-top:110px;}
   .birds-grid{grid-template-columns:repeat(2,1fr);}.bird-emoji{font-size:42px;}.bird-common{font-size:16px;}
   .now-playing{padding:12px 16px;}.np-name{font-size:15px;}
   .featured-inner{flex-direction:column;}
@@ -117,9 +134,10 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 <svg class="bird-silhouette" style="top:15%;--flydip:-20px;animation-duration:18s;" viewBox="0 0 80 40" width="80" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 20 Q10 8 20 20 Q30 8 40 20 M40 20 Q50 8 60 20 Q70 8 80 20" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
 <svg class="bird-silhouette" style="top:35%;--flydip:15px;animation-duration:24s;animation-delay:-8s;" viewBox="0 0 60 30" width="50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 15 Q7.5 6 15 15 Q22.5 6 30 15 M30 15 Q37.5 6 45 15 Q52.5 6 60 15" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
 
-<button class="rain-toggle" id="rainToggle" onclick="toggleRain()" aria-label="Toggle rain ambience">
-  <span class="rain-icon">🌧️</span><span id="rainLabel">Rain</span>
-</button>
+<div class="ambience-panel">
+  <div class="ambience-label">Ambience</div>
+  <div class="ambience-buttons" id="ambienceButtons"></div>
+</div>
 
 <div class="wrap">
   <header>
@@ -159,7 +177,8 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 
 <script>
 // Bird sounds are loaded from the assets folder (e.g. assets/koel.mp3).
-// Rain ambience is loaded from assets/rain.mp3 — add that file to the assets folder.
+// Ambience sounds need these files added to the assets folder:
+//   assets/rain.mp3, assets/wind.mp3, assets/water.mp3, assets/bugs.mp3
 
 const BIRDS = [
   { id:'koel', common:'Asian Koel', hindi:'कोयल (Koyal)', scientific:'Eudynamys scolopaceus', emoji:'🐦', habitat:'Woodland',
@@ -238,33 +257,54 @@ const BIRDS = [
 let currentAudio = null;
 let currentBirdId = null;
 
-// --- Rain ambience state (independent of bird playback) ---
-let rainAudio = null;
-let rainOn = false;
+// --- Ambience sounds (independent of bird playback, and independent of each other) ---
+// Add more entries here any time — the panel and toggle logic are fully generic.
+const AMBIENTS = [
+  { id:'rain',  label:'Rain',  icon:'🌧️', file:'assets/rain.mp3',  volume:0.35 },
+  { id:'wind',  label:'Wind',  icon:'💨', file:'assets/wind.mp3',  volume:0.30 },
+  { id:'water', label:'Water', icon:'🌊', file:'assets/water.mp3', volume:0.30 },
+  { id:'bugs',  label:'Bugs',  icon:'🦗', file:'assets/bugs.mp3',  volume:0.25 }
+];
 
-function toggleRain() {
-  const btn = document.getElementById('rainToggle');
+let ambientAudios = {}; // id -> Audio instance (created lazily on first toggle)
+let ambientOn = {};     // id -> boolean
 
-  if (!rainOn) {
-    if (!rainAudio) {
-      rainAudio = new Audio('assets/rain.mp3');
-      rainAudio.loop = true;
-      rainAudio.volume = 0;
-      rainAudio.addEventListener('error', () => {
-        alert("Sorry, rain sound couldn't be loaded. Make sure assets/rain.mp3 exists.");
-        rainOn = false;
+function renderAmbience() {
+  document.getElementById('ambienceButtons').innerHTML = AMBIENTS.map(a => `
+    <button class="ambience-btn" id="amb-btn-${a.id}" onclick="toggleAmbient('${a.id}')" aria-label="Toggle ${a.label} ambience">
+      <span class="amb-icon">${a.icon}</span><span>${a.label}</span>
+    </button>`).join('');
+}
+
+function toggleAmbient(id) {
+  const conf = AMBIENTS.find(a => a.id === id);
+  if (!conf) return;
+  const btn = document.getElementById('amb-btn-' + id);
+  const isOn = !!ambientOn[id];
+
+  if (!isOn) {
+    if (!ambientAudios[id]) {
+      const audio = new Audio(conf.file);
+      audio.loop = true;
+      audio.volume = 0;
+      audio.addEventListener('error', () => {
+        alert("Sorry, " + conf.label + " sound couldn't be loaded. Make sure " + conf.file + " exists.");
+        ambientOn[id] = false;
         btn.classList.remove('active');
       });
+      ambientAudios[id] = audio;
     }
-    rainAudio.play().catch(() => {
-      // Autoplay was blocked — this shouldn't normally happen since this runs from a click.
+    const audio = ambientAudios[id];
+    audio.play().catch(() => {
+      // Autoplay was blocked — shouldn't normally happen since this runs from a click.
     });
-    fadeAudio(rainAudio, rainAudio.volume, 0.35, 800);
-    rainOn = true;
+    fadeAudio(audio, audio.volume, conf.volume, 800);
+    ambientOn[id] = true;
     btn.classList.add('active');
   } else {
-    fadeAudio(rainAudio, rainAudio.volume, 0, 600, () => rainAudio.pause());
-    rainOn = false;
+    const audio = ambientAudios[id];
+    fadeAudio(audio, audio.volume, 0, 600, () => audio.pause());
+    ambientOn[id] = false;
     btn.classList.remove('active');
   }
 }
@@ -339,7 +379,7 @@ function playBird(id) {
 }
 
 function stopAll() {
-  // Note: this intentionally does NOT touch rainAudio — rain is independent ambience.
+  // Note: this intentionally does NOT touch ambientAudios — ambience sounds keep playing.
   if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; }
   currentBirdId = null;
   document.querySelectorAll('.bird-card').forEach(c => c.classList.remove('playing','loading-sound'));
@@ -400,6 +440,7 @@ function showFeatured(bird) {
 }
 
 renderGrid();
+renderAmbience();
 </script>
 </body>
 </html>
