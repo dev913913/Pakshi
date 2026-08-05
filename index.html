@@ -73,6 +73,10 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .np-info{flex:1;}.np-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text);line-height:1;}.np-sub{font-size:11px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
 .np-stop{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;cursor:pointer;transition:all 0.2s;flex-shrink:0;}
 .np-stop:hover{border-color:rgba(126,184,154,0.4);color:var(--accent);}
+.mix-controls{display:flex;justify-content:flex-end;margin:0 0 14px;}
+.mix-btn{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:9px 14px;cursor:pointer;transition:all 0.2s;}
+.mix-btn:hover{border-color:rgba(126,184,154,0.45);color:var(--accent);}
+.mix-btn.active{border-color:var(--accent);color:var(--accent);box-shadow:0 0 16px rgba(126,184,154,0.2);}
 .featured-panel{display:none;margin-bottom:3px;overflow:hidden;}
 .featured-panel.visible{display:flex;animation:featuredIn 0.45s cubic-bezier(0.4,0,0.2,1) both;}
 @keyframes featuredIn{from{opacity:0;transform:translateY(-12px);}to{opacity:1;transform:translateY(0);}}
@@ -161,6 +165,10 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
         <div class="featured-scientific" id="featuredScientific">—</div>
       </div>
     </div>
+  </div>
+
+  <div class="mix-controls">
+    <button class="mix-btn" id="mixBtn" onclick="toggleMixMode()">▶ Ambient mix · 3 min</button>
   </div>
 
   <div class="grid-label">◆ Tap a bird to hear its call</div>
@@ -256,6 +264,9 @@ const BIRDS = [
 
 let currentAudio = null;
 let currentBirdId = null;
+let mixModeActive = false;
+let mixTimeout = null;
+let mixQueue = [];
 
 // --- Ambience sounds (independent of bird playback, and independent of each other) ---
 // Add more entries here any time — the panel and toggle logic are fully generic.
@@ -378,7 +389,13 @@ function playBird(id) {
     audio.play();
   }, { once: true });
 
-  audio.addEventListener('ended', () => stopAll());
+  audio.addEventListener('ended', () => {
+    if (mixModeActive) {
+      playNextMixBird();
+      return;
+    }
+    stopAll();
+  });
   audio.addEventListener('error', () => {
     card.classList.remove('loading-sound');
     alert("Sorry, sound failed to load for " + bird.common);
@@ -430,6 +447,55 @@ function spawnRipple(card) {
       setTimeout(() => el.remove(), 3500);
     }, i*300);
   }
+}
+
+
+function toggleMixMode() {
+  if (mixModeActive) {
+    stopMixMode();
+    return;
+  }
+
+  stopAll();
+  mixModeActive = true;
+  mixQueue = [];
+  document.getElementById('mixBtn').classList.add('active');
+  document.getElementById('mixBtn').textContent = '■ Stop ambient mix';
+
+  mixTimeout = setTimeout(() => {
+    stopMixMode();
+  }, 3 * 60 * 1000);
+
+  playNextMixBird();
+}
+
+function stopMixMode() {
+  mixModeActive = false;
+  if (mixTimeout) {
+    clearTimeout(mixTimeout);
+    mixTimeout = null;
+  }
+  mixQueue = [];
+  document.getElementById('mixBtn').classList.remove('active');
+  document.getElementById('mixBtn').textContent = '▶ Ambient mix · 3 min';
+  stopAll();
+}
+
+function playNextMixBird() {
+  if (!mixModeActive) return;
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+// in playNextMixBird:
+if (!mixQueue.length) {
+  mixQueue = shuffleArray([...BIRDS]).map(b => b.id);
+}
+  const next = mixQueue.shift();
+  playBird(next);
 }
 
 function showFeatured(bird) {
