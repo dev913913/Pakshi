@@ -125,6 +125,7 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .bird-card.playing .bird-photo{border-color:var(--accent);box-shadow:0 0 20px rgba(126,184,154,0.4);}
 .bird-emoji-fallback{font-size:60px;filter:drop-shadow(0 4px 20px rgba(0,0,0,0.5));line-height:1;}
 .habitat-tag{position:absolute;top:12px;right:12px;z-index:2;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.5);background:rgba(0,0,0,0.3);padding:4px 8px;border:1px solid rgba(255,255,255,0.1);}
+.multi-sound-tag{position:absolute;top:12px;left:12px;z-index:2;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);background:rgba(126,184,154,0.15);padding:4px 8px;border:1px solid rgba(126,184,154,0.3);border-radius:10px;}
 .bird-info{position:relative;z-index:2;padding:16px 20px 18px;background:linear-gradient(transparent,rgba(0,0,0,0.7) 40%,rgba(0,0,0,0.9));}
 .bird-common{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);line-height:1;}
 .bird-hindi{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:rgba(255,255,255,0.5);margin-top:2px;}
@@ -340,7 +341,10 @@ const BIRDS = [
 
   { id:'woodpecker', common:'Black-rumped Flameback', hindi:'कठफोड़वा (Kathphodwa)', scientific:'Dinopium benghalense', emoji:'🐦', habitat:'Forest & Garden',
     fact:"Drums up to 20 times a second on tree trunks — a form of communication, not just insect hunting.",
-    sound:'assets/woodpecker.mp3',
+    sounds:[
+      { label:'Call', file:'assets/woodpecker.mp3' },
+      { label:'Drumming', file:'assets/woodpecker-drum.mp3' }
+    ],
     bg:'linear-gradient(160deg,#150f00 0%,#332200 40%,#1f1600 100%)', bgGlow:'rgba(220,160,0,0.3)', particleColor:'#FFC107',
     cardBg:'linear-gradient(135deg,#332200,#150f00)' },
 
@@ -451,6 +455,17 @@ function fadeAudio(audio, from, to, duration, onDone) {
   }, stepTime);
 }
 
+function defaultPlayText(bird) {
+  return bird.sounds ? 'Tap for ' + bird.sounds[0].label : 'Tap to play';
+}
+
+function resetAllPlayTexts() {
+  BIRDS.forEach(b => {
+    const el = document.getElementById('playtxt-' + b.id);
+    if (el) el.textContent = defaultPlayText(b);
+  });
+}
+
 function renderGrid(list) {
   const birds = list || BIRDS;
   const grid = document.getElementById('birdsGrid');
@@ -468,9 +483,10 @@ function renderGrid(list) {
   grid.innerHTML = birds.map(b => `
     <div class="bird-card" id="card-${b.id}" onclick="playBird('${b.id}')"
          onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();playBird('${b.id}');}"
-         tabindex="0" role="button" aria-label="Play ${b.common} call"
+         tabindex="0" role="button" aria-label="${b.sounds ? 'Play ' + b.common + ', tap again to cycle through ' + b.sounds.length + ' sounds' : 'Play ' + b.common + ' call'}"
          style="--card-bg:${b.cardBg}">
       <div class="habitat-tag">${b.habitat}</div>
+      ${b.sounds ? `<div class="multi-sound-tag">${b.sounds.length} sounds</div>` : ''}
       <div class="bird-photo-wrap">
         <div class="bird-emoji-fallback">${b.emoji}</div>
       </div>
@@ -480,7 +496,7 @@ function renderGrid(list) {
         <div class="bird-scientific">${b.scientific}</div>
         <div class="play-indicator">
           <div class="play-dot"></div>
-          <div class="play-text" id="playtxt-${b.id}">Tap to play</div>
+          <div class="play-text" id="playtxt-${b.id}">${defaultPlayText(b)}</div>
         </div>
       </div>
     </div>`).join('');
@@ -504,14 +520,38 @@ function filterBirds(query) {
   renderGrid(filtered);
 }
 
+let currentSoundIndex = 0;
+
+function getSoundList(bird) {
+  return bird.sounds || [{ label: null, file: bird.sound }];
+}
+
 function playBird(id) {
   const bird = BIRDS.find(b => b.id === id);
   if (!bird) return;
-  if (currentBirdId === id) { stopAll(); return; }
+  const soundList = getSoundList(bird);
+
+  if (currentBirdId === id) {
+    if (soundList.length > 1) {
+      currentSoundIndex = (currentSoundIndex + 1) % soundList.length;
+      playSoundForBird(bird, soundList, currentSoundIndex);
+      return;
+    }
+    stopAll();
+    return;
+  }
+
+  currentSoundIndex = 0;
+  playSoundForBird(bird, soundList, currentSoundIndex);
+}
+
+function playSoundForBird(bird, soundList, index) {
+  const id = bird.id;
+  const entry = soundList[index];
 
   if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
   document.querySelectorAll('.bird-card').forEach(c => c.classList.remove('playing','loading-sound'));
-  document.querySelectorAll('[id^="playtxt-"]').forEach(t => t.textContent = 'Tap to play');
+  resetAllPlayTexts();
 
   currentBirdId = id;
   const card = document.getElementById('card-'+id);
@@ -523,14 +563,16 @@ function playBird(id) {
   spawnRipple(card);
   document.querySelectorAll('.bird-silhouette').forEach(s => s.classList.add('active'));
 
-  const audio = new Audio(bird.sound);
+  const audio = new Audio(entry.file);
   audio.addEventListener('canplaythrough', () => {
     currentAudio = audio;
     card.classList.remove('loading-sound');
     card.classList.add('playing');
-    document.getElementById('playtxt-'+id).textContent = 'Now playing...';
+    document.getElementById('playtxt-'+id).textContent = entry.label
+      ? '▸ ' + entry.label + (soundList.length > 1 ? ' · tap for next' : '')
+      : 'Now playing...';
     document.getElementById('npName').textContent = bird.common;
-    document.getElementById('npSub').textContent = bird.hindi + ' · ' + bird.habitat;
+    document.getElementById('npSub').textContent = bird.hindi + ' · ' + bird.habitat + (entry.label ? ' · ' + entry.label : '');
     document.getElementById('nowPlaying').classList.add('visible');
     audio.play();
   }, { once: true });
@@ -540,9 +582,9 @@ function playBird(id) {
     // Only reset state if this audio still corresponds to the current bird
     if (currentBirdId === id) {
       card.classList.remove('loading-sound');
-      document.getElementById('playtxt-'+id).textContent = 'Tap to play';
+      document.getElementById('playtxt-'+id).textContent = defaultPlayText(bird);
       currentBirdId = null;
-      showToast("Sorry, sound failed to load for " + bird.common);
+      showToast("Sorry, sound failed to load for " + bird.common + (entry.label ? ' (' + entry.label + ')' : ''));
     }
   });
 }
@@ -552,7 +594,7 @@ function stopAll() {
   if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; }
   currentBirdId = null;
   document.querySelectorAll('.bird-card').forEach(c => c.classList.remove('playing','loading-sound'));
-  document.querySelectorAll('[id^="playtxt-"]').forEach(t => t.textContent = 'Tap to play');
+  resetAllPlayTexts();
   document.getElementById('nowPlaying').classList.remove('visible');
   document.getElementById('featuredPanel').classList.remove('visible');
   document.querySelectorAll('.bird-silhouette').forEach(s => s.classList.remove('active'));
