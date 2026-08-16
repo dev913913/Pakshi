@@ -167,7 +167,6 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
     <div class="featured-inner">
       <div class="featured-left">
         <div class="featured-photo-wrap">
-          <img class="featured-photo" id="featuredPhoto" src="" alt="" style="display:none"/>
           <div class="featured-emoji-fallback" id="featuredEmojiFallback">🐦</div>
         </div>
         <div class="featured-bird-name" id="featuredName">—</div>
@@ -191,7 +190,7 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 <div class="now-playing" id="nowPlaying">
   <div class="np-wave"><div class="np-bar"></div><div class="np-bar"></div><div class="np-bar"></div><div class="np-bar"></div><div class="np-bar"></div></div>
   <div class="np-info"><div class="np-name" id="npName">—</div><div class="np-sub" id="npSub">Now playing</div></div>
-  <button class="np-stop" onclick="stopAll()">■ Stop</button>
+  <button type="button" class="np-stop" onclick="stopAll()">■ Stop</button>
 </div>
 
 <script>
@@ -205,133 +204,114 @@ const BIRDS = [
   { id:'koel', common:'Asian Koel', hindi:'कोयल (Koyal)', scientific:'Eudynamys scolopaceus', emoji:'🐦', habitat:'Woodland',
     fact:"The Koel's haunting call is the sound of Indian spring. Only the male sings.", 
     sound:'assets/koel.mp3',
-    image:'assets/images/koel.jpg',
     bg:'linear-gradient(160deg,#0a1f0a 0%,#1a3d1a 40%,#0d2a1a 100%)', bgGlow:'rgba(30,100,30,0.35)', particleColor:'#4CAF50',
     cardBg:'linear-gradient(135deg,#1a3d1a,#0a1f0a)' },
 
   { id:'peacock', common:'Indian Peacock', hindi:'मोर (Mor)', scientific:'Pavo cristatus', emoji:'🦚', habitat:'Forest & Farm',
     fact:"India's national bird. The dramatic call signals the monsoon.",
     sound:'assets/peacock.mp3',
-    image:'assets/images/peacock.jpg',
     bg:'linear-gradient(160deg,#0a0f1f 0%,#1a1f3d 40%,#0d1a2a 100%)', bgGlow:'rgba(30,50,150,0.3)', particleColor:'#3F51B5',
     cardBg:'linear-gradient(135deg,#1a1f3d,#0a0f1f)' },
 
   { id:'mynah', common:'Common Myna', hindi:'मैना (Maina)', scientific:'Acridotheres tristis', emoji:'🐤', habitat:'Urban & Rural',
     fact:"One of the world's most intelligent birds — mimics human speech.",
     sound:'assets/mynah.mp3',
-    image:'assets/images/mynah.jpg',
     bg:'linear-gradient(160deg,#1a1000 0%,#3d2800 40%,#2a1a00 100%)', bgGlow:'rgba(150,100,0,0.3)', particleColor:'#FF9800',
     cardBg:'linear-gradient(135deg,#3d2800,#1a1000)' },
 
   { id:'sparrow', common:'House Sparrow', hindi:'गौरैया (Gauraiya)', scientific:'Passer domesticus', emoji:'🐦', habitat:'Urban',
     fact:"Once India's most common city bird, now declining due to mobile towers.",
     sound:'assets/sparrow.mp3',
-    image:'assets/images/sparrow.jpg',
     bg:'linear-gradient(160deg,#1a1208 0%,#2e2010 40%,#1a1208 100%)', bgGlow:'rgba(120,80,30,0.3)', particleColor:'#A1887F',
     cardBg:'linear-gradient(135deg,#2e2010,#1a1208)' },
 
   { id:'kingfisher', common:'Common Kingfisher', hindi:'राम चिरैया', scientific:'Alcedo atthis', emoji:'🦜', habitat:'Riverbank',
     fact:"Dives at 40 km/h. Its beak inspired Japan's bullet train.",
     sound:'assets/kingfisher.mp3',
-    image:'assets/images/kingfisher.jpg',
     bg:'linear-gradient(160deg,#001a2a 0%,#003d5c 40%,#001f3a 100%)', bgGlow:'rgba(0,100,200,0.35)', particleColor:'#03A9F4',
     cardBg:'linear-gradient(135deg,#003d5c,#001a2a)' },
 
   { id:'owl', common:'Indian Scops Owl', hindi:'उल्लू (Ullu)', scientific:'Otus bakkamoena', emoji:'🦉', habitat:'Night Forest',
     fact:"Can rotate head 270°. Symbol of wisdom and Goddess Lakshmi.",
     sound:'assets/owl.mp3',
-    image:'assets/images/owl.jpg',
     bg:'linear-gradient(160deg,#050510 0%,#0a0a20 40%,#080814 100%)', bgGlow:'rgba(80,0,180,0.25)', particleColor:'#9C27B0',
     cardBg:'linear-gradient(135deg,#0a0a20,#050510)' },
 
   { id:'flamingo', common:'Greater Flamingo', hindi:'राजहंस', scientific:'Phoenicopterus roseus', emoji:'🦩', habitat:'Wetlands',
     fact:"Pink colour comes from algae. Over a million visit Mumbai every winter.",
     sound:'assets/flamingo.mp3',
-    image:'assets/images/flamingo.jpg',
     bg:'linear-gradient(160deg,#1a0a10 0%,#3d1a28 40%,#2a0f1a 100%)', bgGlow:'rgba(220,80,120,0.3)', particleColor:'#E91E63',
     cardBg:'linear-gradient(135deg,#3d1a28,#1a0a10)' },
 
   { id:'eagle', common:'Crested Serpent Eagle', hindi:'बाज (Baaz)', scientific:'Spilornis cheela', emoji:'🦅', habitat:'Dense Forest',
     fact:"Specialises in hunting snakes. Inspired Garuda in Indian emblem.",
     sound:'assets/eagle.mp3',
-    image:'assets/images/eagle.jpg',
     bg:'linear-gradient(160deg,#100800 0%,#2a1800 40%,#1a1000 100%)', bgGlow:'rgba(180,100,0,0.3)', particleColor:'#FF6F00',
     cardBg:'linear-gradient(135deg,#2a1800,#100800)' },
 
   { id:'crane', common:'Sarus Crane', hindi:'सारस (Saras)', scientific:'Antigone antigone', emoji:'🕊️', habitat:'Wetland & Field',
     fact:"World's tallest flying bird. Mate for life. Inspired first Sanskrit verse.",
     sound:'assets/crane.mp3',
-    image:'assets/images/crane.jpg',
     bg:'linear-gradient(160deg,#0a1a0a 0%,#1a3a0a 40%,#0f2a0f 100%)', bgGlow:'rgba(100,180,50,0.25)', particleColor:'#8BC34A',
     cardBg:'linear-gradient(135deg,#1a3a0a,#0a1a0a)' },
 
   { id:'hornbill', common:'Great Hornbill', hindi:'धनेश (Dhanesh)', scientific:'Buceros bicornis', emoji:'🦜', habitat:'Tropical Forest',
     fact:"Hollow casque amplifies calls. State bird of Kerala & Arunachal.",
     sound:'assets/hornbill.mp3',
-    image:'assets/images/hornbill.jpg',
     bg:'linear-gradient(160deg,#001a00 0%,#003300 40%,#001a08 100%)', bgGlow:'rgba(0,150,50,0.3)', particleColor:'#FFEB3B',
     cardBg:'linear-gradient(135deg,#003300,#001a00)' },
 
   { id:'sunbird', common:'Purple Sunbird', hindi:'शक्कर खोरा', scientific:'Cinnyris asiaticus', emoji:'🐦', habitat:'Garden & Grove',
     fact:"India's hummingbird. Important pollinator of garden flowers.",
     sound:'assets/sunbird.mp3',
-    image:'assets/images/sunbird.jpg',
     bg:'linear-gradient(160deg,#0f001f 0%,#1f003f 40%,#180030 100%)', bgGlow:'rgba(120,0,200,0.3)', particleColor:'#7B1FA2',
     cardBg:'linear-gradient(135deg,#1f003f,#0f001f)' },
 
   { id:'bulbul', common:'Red-whiskered Bulbul', hindi:'बुलबुल (Bulbul)', scientific:'Pycnonotus jocosus', emoji:'🐤', habitat:'Garden & Scrub',
     fact:"Poet's bird of India. Symbol of soul's longing in Sufi poetry.",
     sound:'assets/bulbul.mp3',
-    image:'assets/images/bulbul.jpg',
     bg:'linear-gradient(160deg,#1a0800 0%,#3d1800 40%,#2a1000 100%)', bgGlow:'rgba(200,80,0,0.3)', particleColor:'#FF5722',
     cardBg:'linear-gradient(135deg,#3d1800,#1a0800)' },
 
   { id:'parakeet', common:'Rose-ringed Parakeet', hindi:'तोता (Tota)', scientific:'Psittacula krameri', emoji:'🦜', habitat:'Urban & Garden',
     fact:"India's most familiar parrot. Famous for mimicking human speech and raiding orchards in noisy flocks.",
     sound:'assets/parakeet.mp3',
-    image:'assets/images/parakeet.jpg',
     bg:'linear-gradient(160deg,#001f0a 0%,#00401a 40%,#00250f 100%)', bgGlow:'rgba(0,180,80,0.3)', particleColor:'#00C853',
     cardBg:'linear-gradient(135deg,#00401a,#001f0a)' },
 
   { id:'barbet', common:'Coppersmith Barbet', hindi:'छोटा बसंत (Chota Basant)', scientific:'Psilopogon haemacephalus', emoji:'🐦', habitat:'Garden & Orchard',
     fact:"Named for its metallic 'tuk-tuk-tuk' call, said to sound like a coppersmith hammering metal.",
     sound:'assets/barbet.mp3',
-    image:'assets/images/barbet.jpg',
     bg:'linear-gradient(160deg,#1f0505 0%,#3d0a0a 40%,#2a0808 100%)', bgGlow:'rgba(200,30,30,0.3)', particleColor:'#E53935',
     cardBg:'linear-gradient(135deg,#3d0a0a,#1f0505)' },
 
   { id:'robin', common:'Indian Robin', hindi:'कालचिड़ी (Kalchidi)', scientific:'Copsychus fuscatus', emoji:'🐦', habitat:'Scrub & Garden',
     fact:"A confident little singer that cocks its tail upright while delivering cheerful, whistling songs.",
     sound:'assets/robin.mp3',
-    image:'assets/images/robin.jpg',
     bg:'linear-gradient(160deg,#0a0a0a 0%,#1f1f1f 40%,#151515 100%)', bgGlow:'rgba(150,150,150,0.25)', particleColor:'#B0BEC5',
     cardBg:'linear-gradient(135deg,#1f1f1f,#0a0a0a)' },
 
   { id:'babbler', common:'Jungle Babbler', hindi:'सात भाई (Saat Bhai)', scientific:'Argya striata', emoji:'🐦', habitat:'Garden & Scrub',
     fact:"Almost always seen in noisy groups of six or seven, earning it the nickname 'Seven Sisters/Brothers'.",
     sound:'assets/babbler.mp3',
-    image:'assets/images/babbler.jpg',
     bg:'linear-gradient(160deg,#1a1608 0%,#3d3410 40%,#2a2408 100%)', bgGlow:'rgba(180,150,30,0.3)', particleColor:'#C0A030',
     cardBg:'linear-gradient(135deg,#3d3410,#1a1608)' },
 
   { id:'woodpecker', common:'Black-rumped Flameback', hindi:'कठफोड़वा (Kathphodwa)', scientific:'Dinopium benghalense', emoji:'🐦', habitat:'Forest & Garden',
     fact:"Drums up to 20 times a second on tree trunks — a form of communication, not just insect hunting.",
     sound:'assets/woodpecker.mp3',
-    image:'assets/images/woodpecker.jpg',
     bg:'linear-gradient(160deg,#150f00 0%,#332200 40%,#1f1600 100%)', bgGlow:'rgba(220,160,0,0.3)', particleColor:'#FFC107',
     cardBg:'linear-gradient(135deg,#332200,#150f00)' },
 
   { id:'pigeon', common:'Rock Pigeon', hindi:'कबूतर (Kabootar)', scientific:'Columba livia', emoji:'🐦', habitat:'Urban',
     fact:"India's most familiar city bird. Descended from wild Rock Doves once used to carry messages across kingdoms.",
     sound:'assets/pigeon.mp3',
-    image:'assets/images/pigeon.jpg',
     bg:'linear-gradient(160deg,#0a1420 0%,#1a2e40 40%,#0f1c2a 100%)', bgGlow:'rgba(90,130,170,0.3)', particleColor:'#78909C',
     cardBg:'linear-gradient(135deg,#1a2e40,#0a1420)' },
 
   { id:'crow', common:'House Crow', hindi:'कौआ (Kawa)', scientific:'Corvus splendens', emoji:'🐦‍⬛', habitat:'Urban & Rural',
     fact:"Revered in Hindu tradition as messengers to ancestors during Shraddha rituals. Remarkably intelligent and social.",
     sound:'assets/crow.mp3',
-    image:'assets/images/crow.jpg',
     bg:'linear-gradient(160deg,#050505 0%,#12121a 40%,#08080c 100%)', bgGlow:'rgba(60,60,90,0.3)', particleColor:'#546E7A',
     cardBg:'linear-gradient(135deg,#12121a,#050505)' }
 ];
@@ -430,19 +410,12 @@ function fadeAudio(audio, from, to, duration, onDone) {
   }, stepTime);
 }
 
-function handlePhotoError(img) {
-  img.style.display = 'none';
-  const fallback = img.nextElementSibling;
-  if (fallback) fallback.style.display = 'flex';
-}
-
 function renderGrid() {
   document.getElementById('birdsGrid').innerHTML = BIRDS.map(b => `
     <div class="bird-card" id="card-${b.id}" onclick="playBird('${b.id}')" style="--card-bg:${b.cardBg}">
       <div class="habitat-tag">${b.habitat}</div>
       <div class="bird-photo-wrap">
-        <img class="bird-photo" src="${b.image}" alt="${b.common}" loading="lazy" onerror="handlePhotoError(this)"/>
-        <div class="bird-emoji-fallback" style="display:none">${b.emoji}</div>
+        <div class="bird-emoji-fallback">${b.emoji}</div>
       </div>
       <div class="bird-info">
         <div class="bird-common">${b.common}</div>
@@ -545,15 +518,8 @@ function showFeatured(bird) {
   const panel = document.getElementById('featuredPanel');
   panel.classList.remove('visible');
   setTimeout(() => {
-    const photo = document.getElementById('featuredPhoto');
     const fallback = document.getElementById('featuredEmojiFallback');
     fallback.textContent = bird.emoji;
-    photo.style.display = 'none';
-    fallback.style.display = 'flex';
-    photo.onerror = () => { photo.style.display = 'none'; fallback.style.display = 'flex'; };
-    photo.onload = () => { photo.style.display = 'block'; fallback.style.display = 'none'; };
-    photo.src = bird.image || '';
-    photo.alt = bird.common;
 
     document.getElementById('featuredName').textContent = bird.common;
     document.getElementById('featuredHindi').textContent = bird.hindi;
