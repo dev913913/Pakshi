@@ -1,79 +1,72 @@
-<!DOCTYPE html>  <html lang="en">  
-<head>  
-<meta charset="UTF-8"/>  
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>  
-<title>Pakshi — Indian Bird Sound Library</title>  
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>  
-<style>  
-:root {  
-  --bg: #0d1117; --text: #e8e0d4; --muted: rgba(232,224,212,0.45);  
-  --card: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08);  
-  --accent: #7eb89a; --transition: 1.2s cubic-bezier(0.4,0,0.2,1);  
-}  
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}  
-html{scroll-behavior:smooth;}  
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;transition:background var(--transition);}  
-body::before{content:'';position:fixed;inset:-50%;background:repeating-conic-gradient(from 0deg at 50% 50%,transparent 0deg,transparent 5deg,rgba(126,184,154,0.008) 5deg,rgba(126,184,154,0.008) 5.5deg);animation:bgSpin 200s linear infinite;pointer-events:none;z-index:0;}  
-@keyframes bgSpin{to{transform:rotate(360deg);}}  
-.bg-layer{position:fixed;inset:0;z-index:0;transition:opacity var(--transition);pointer-events:none;}  
-.bg-default{background:radial-gradient(ellipse at 20% 50%,rgba(30,60,30,0.4) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(20,40,60,0.3) 0%,transparent 50%),linear-gradient(160deg,#0d1117 0%,#0a1a0e 50%,#0d1117 100%);opacity:1;}  
-.bg-active{opacity:0;}.bg-active.visible{opacity:1;}  
-.particles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}  
-.particle{position:absolute;border-radius:50%;animation:drift linear infinite;opacity:0;}  
-@keyframes drift{0%{transform:translateY(100vh) translateX(0) scale(0);opacity:0;}10%{opacity:1;}90%{opacity:0.6;}100%{transform:translateY(-20vh) translateX(var(--drift)) scale(1.5);opacity:0;}}  
-.bird-silhouette{position:fixed;z-index:0;pointer-events:none;opacity:0;transition:opacity 0.8s ease;animation:flyAcross linear infinite;}  
-.bird-silhouette.active{opacity:0.1;}  
-@keyframes flyAcross{0%{transform:translateX(-100px) translateY(0);}50%{transform:translateX(50vw) translateY(var(--flydip));}100%{transform:translateX(calc(100vw + 100px)) translateY(0);}}  
-.ripple-container{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}  
-.ripple{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,0.15);animation:rippleOut 3s ease-out forwards;transform:translate(-50%,-50%);}  
-@keyframes rippleOut{0%{width:0;height:0;opacity:0.8;}100%{width:600px;height:600px;opacity:0;}}  
-.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px 100px;}  
-header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}  
-.header-eyebrow{font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:6px;color:var(--muted);text-transform:uppercase;margin-bottom:16px;}  
-.header-title{font-family:'Cormorant Garamond',serif;font-size:clamp(52px,8vw,86px);font-weight:600;line-height:0.95;color:var(--text);letter-spacing:-1px;}  
-.header-title em{font-style:italic;color:var(--accent);}  
-.header-hindi{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(16px,3vw,22px);color:var(--muted);margin-top:10px;letter-spacing:2px;}  
-.header-divider{display:flex;align-items:center;justify-content:center;gap:16px;margin:24px 0 0;}  
-.hdline{flex:1;max-width:140px;height:1px;background:linear-gradient(90deg,transparent,rgba(126,184,154,0.3),transparent);}  
-.hddot{width:4px;height:4px;border-radius:50%;background:var(--accent);opacity:0.5;}  /* --- Ambience panel (rain / wind / water / bugs) --- */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Pakshi — Indian Bird Sound Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0d1117; --text: #e8e0d4; --muted: rgba(232,224,212,0.45);
+  --card: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08);
+  --accent: #7eb89a; --transition: 1.2s cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;transition:background var(--transition);}
+body::before{content:'';position:fixed;inset:-50%;background:repeating-conic-gradient(from 0deg at 50% 50%,transparent 0deg,transparent 5deg,rgba(126,184,154,0.008) 5deg,rgba(126,184,154,0.008) 5.5deg);animation:bgSpin 200s linear infinite;pointer-events:none;z-index:0;}
+@keyframes bgSpin{to{transform:rotate(360deg);}}
+.bg-layer{position:fixed;inset:0;z-index:0;transition:opacity var(--transition);pointer-events:none;}
+.bg-default{background:radial-gradient(ellipse at 20% 50%,rgba(30,60,30,0.4) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(20,40,60,0.3) 0%,transparent 50%),linear-gradient(160deg,#0d1117 0%,#0a1a0e 50%,#0d1117 100%);opacity:1;}
+.bg-active{opacity:0;}.bg-active.visible{opacity:1;}
+.particles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.particle{position:absolute;border-radius:50%;animation:drift linear infinite;opacity:0;}
+@keyframes drift{0%{transform:translateY(100vh) translateX(0) scale(0);opacity:0;}10%{opacity:1;}90%{opacity:0.6;}100%{transform:translateY(-20vh) translateX(var(--drift)) scale(1.5);opacity:0;}}
+.bird-silhouette{position:fixed;z-index:0;pointer-events:none;opacity:0;transition:opacity 0.8s ease;animation:flyAcross linear infinite;}
+.bird-silhouette.active{opacity:0.1;}
+@keyframes flyAcross{0%{transform:translateX(-100px) translateY(0);}50%{transform:translateX(50vw) translateY(var(--flydip));}100%{transform:translateX(calc(100vw + 100px)) translateY(0);}}
+.ripple-container{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.ripple{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,0.15);animation:rippleOut 3s ease-out forwards;transform:translate(-50%,-50%);}
+@keyframes rippleOut{0%{width:0;height:0;opacity:0.8;}100%{width:600px;height:600px;opacity:0;}}
+.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px 100px;}
+header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
+.header-eyebrow{font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:6px;color:var(--muted);text-transform:uppercase;margin-bottom:16px;}
+.header-title{font-family:'Cormorant Garamond',serif;font-size:clamp(52px,8vw,86px);font-weight:600;line-height:0.95;color:var(--text);letter-spacing:-1px;}
+.header-title em{font-style:italic;color:var(--accent);}
+.header-hindi{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(16px,3vw,22px);color:var(--muted);margin-top:10px;letter-spacing:2px;}
+.header-divider{display:flex;align-items:center;justify-content:center;gap:16px;margin:24px 0 0;}
+.hdline{flex:1;max-width:140px;height:1px;background:linear-gradient(90deg,transparent,rgba(126,184,154,0.3),transparent);}
+.hddot{width:4px;height:4px;border-radius:50%;background:var(--accent);opacity:0.5;}
+
+/* --- Ambience panel (rain / wind / water / bugs) --- */
 .ambience-panel{position:fixed;top:20px;right:20px;z-index:101;background:rgba(13,17,23,0.75);
-backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:16px;
-padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px;
-box-shadow:0 8px 30px rgba(0,0,0,0.35);}
+  backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:16px;
+  padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.35);}
 .ambience-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);
-display:flex;align-items:center;gap:6px;}
+  display:flex;align-items:center;gap:6px;}
 .ambience-label::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--accent);opacity:0.6;}
 .ambience-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .panel-section{display:flex;flex-direction:column;gap:10px;}
 .panel-divider{height:1px;background:linear-gradient(90deg,transparent,var(--border) 20%,var(--border) 80%,transparent);margin:1px 0;}
 .ambience-btn{display:flex;align-items:center;justify-content:center;gap:6px;
-background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--muted);
-font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.5px;padding:9px 12px;
-border-radius:12px;cursor:pointer;transition:all 0.25s ease;white-space:nowrap;}
+  background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--muted);
+  font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.5px;padding:9px 12px;
+  border-radius:12px;cursor:pointer;transition:all 0.25s ease;white-space:nowrap;}
 .ambience-btn:hover{border-color:rgba(126,184,154,0.35);color:var(--text);background:rgba(255,255,255,0.06);}
+.ambience-btn:active{transform:scale(0.94);}
+.ambience-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 .ambience-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(126,184,154,0.12);
-box-shadow:0 0 16px rgba(126,184,154,0.15);}
+  box-shadow:0 0 16px rgba(126,184,154,0.15);}
 .ambience-btn .amb-icon{font-size:14px;line-height:1;}
 .ambience-btn.active .amb-icon{animation:ambPulse 1.8s ease-in-out infinite;}
 @keyframes ambPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
-/* Talk to Tota button & recording UI */
-.tota-talk-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
-background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.35);color:#7eb89a;
-font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:0.5px;padding:11px 14px;
-border-radius:12px;cursor:pointer;transition:all 0.25s ease;margin-top:2px;}
-.tota-talk-btn:hover{background:rgba(0,200,83,0.15);border-color:rgba(0,200,83,0.55);color:#a8e6c3;}
-.tota-talk-btn.recording{background:rgba(229,57,53,0.18);border-color:rgba(229,57,53,0.6);color:#ff8a80;
-animation:recPulse 1.2s ease-in-out infinite;}
-.tota-talk-btn.playing-back{background:rgba(126,184,154,0.2);border-color:var(--accent);color:var(--accent);}
-@keyframes recPulse{0%,100%{box-shadow:0 0 0 0 rgba(229,57,53,0.3);}50%{box-shadow:0 0 0 8px rgba(229,57,53,0);}}
-.tota-hint{font-size:9px;color:var(--muted);text-align:center;letter-spacing:0.5px;margin-top:4px;line-height:1.4;}
 @media(max-width:600px){
-.ambience-panel{top:12px;right:12px;left:12px;padding:12px 14px 14px;border-radius:14px;gap:10px;}
-.panel-section{gap:6px;}
-.ambience-buttons{grid-template-columns:repeat(4,1fr);gap:6px;}
-.ambience-btn{flex-direction:column;padding:8px 4px;font-size:9px;gap:3px;}
-.ambience-btn .amb-icon{font-size:16px;}
-.tota-talk-btn{font-size:11px;padding:10px 12px;}
+  .ambience-panel{top:12px;right:12px;left:12px;padding:12px 14px 14px;border-radius:14px;gap:10px;}
+  .panel-section{gap:6px;}
+  .ambience-buttons{grid-template-columns:repeat(4,1fr);gap:6px;}
+  .ambience-btn{flex-direction:column;padding:8px 4px;font-size:9px;gap:3px;}
+  .ambience-btn .amb-icon{font-size:16px;}
 }
 
 .now-playing{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(10,15,10,0.94);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;gap:16px;transform:translateY(100%);transition:transform 0.4s cubic-bezier(0.4,0,0.2,1);}
@@ -85,13 +78,15 @@ animation:recPulse 1.2s ease-in-out infinite;}
 .np-info{flex:1;}.np-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text);line-height:1;}.np-sub{font-size:11px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
 .np-stop{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;cursor:pointer;transition:all 0.2s;flex-shrink:0;}
 .np-stop:hover{border-color:rgba(126,184,154,0.4);color:var(--accent);}
+.np-stop:active{transform:scale(0.95);}
+.np-stop:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 .featured-panel{display:none;margin-bottom:3px;overflow:hidden;}
 .featured-panel.visible{display:flex;animation:featuredIn 0.45s cubic-bezier(0.4,0,0.2,1) both;}
 @keyframes featuredIn{from{opacity:0;transform:translateY(-12px);}to{opacity:1;transform:translateY(0);}}
 .featured-inner{display:flex;width:100%;border:1px solid rgba(126,184,154,0.35);border-top:3px solid var(--accent);background:rgba(126,184,154,0.04);overflow:hidden;}
 .featured-left{flex-shrink:0;width:200px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;border-right:1px solid var(--border);background:rgba(0,0,0,0.2);}
 .featured-photo-wrap{width:84px;height:84px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
-filter:drop-shadow(0 0 24px rgba(126,184,154,0.5));animation:birdFloat 3s ease-in-out infinite;}
+  filter:drop-shadow(0 0 24px rgba(126,184,154,0.5));animation:birdFloat 3s ease-in-out infinite;}
 @keyframes birdFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
 .featured-photo{width:84px;height:84px;border-radius:50%;object-fit:cover;border:2px solid rgba(126,184,154,0.4);}
 .featured-emoji-fallback{font-size:66px;line-height:1;text-align:center;}
@@ -103,10 +98,21 @@ filter:drop-shadow(0 0 24px rgba(126,184,154,0.5));animation:birdFloat 3s ease-i
 .featured-fact{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2vw,19px);line-height:1.7;color:rgba(232,224,212,0.8);font-style:italic;}
 .featured-scientific{font-size:11px;color:rgba(232,224,212,0.2);letter-spacing:1px;font-style:italic;}
 .grid-label{font-size:11px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;margin-bottom:20px;animation:fadeUp 0.8s 0.1s ease both;}
+.search-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;animation:fadeUp 0.8s 0.15s ease both;}
+.bird-search{flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:14px;padding:12px 16px;border-radius:10px;outline:none;
+  transition:border-color 0.25s ease,background 0.25s ease;}
+.bird-search::placeholder{color:var(--muted);}
+.bird-search:focus{border-color:rgba(126,184,154,0.5);background:rgba(255,255,255,0.06);}
+.search-count{font-size:11px;color:var(--muted);letter-spacing:0.5px;white-space:nowrap;flex-shrink:0;}
+.no-results{text-align:center;padding:60px 20px;color:var(--muted);font-family:'Cormorant Garamond',serif;
+  font-style:italic;font-size:18px;}
 .birds-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:2px;animation:fadeUp 0.8s 0.2s ease both;}
 .bird-card{background:var(--card);border:1px solid var(--border);cursor:pointer;transition:all 0.3s ease;position:relative;overflow:hidden;aspect-ratio:4/3;display:flex;flex-direction:column;justify-content:flex-end;}
 .bird-card::before{content:'';position:absolute;inset:0;background:var(--card-bg,linear-gradient(135deg,#1a2a1a,#0d1a0d));transition:transform 0.6s cubic-bezier(0.4,0,0.2,1);z-index:0;}
 .bird-card:hover{border-color:rgba(255,255,255,0.15);transform:translateY(-2px);}.bird-card:hover::before{transform:scale(1.05);}
+.bird-card:active{transform:translateY(0) scale(0.97);}
+.bird-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 .bird-card.playing{border-color:var(--accent);box-shadow:0 0 30px rgba(126,184,154,0.2),inset 0 0 30px rgba(126,184,154,0.05);}
 .bird-card.loading-sound{border-color:rgba(126,184,154,0.4);}
 .bird-photo-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;transition:transform 0.4s ease;}
@@ -114,7 +120,7 @@ filter:drop-shadow(0 0 24px rgba(126,184,154,0.5));animation:birdFloat 3s ease-i
 .bird-card.playing .bird-photo-wrap{animation:birdBob 1s ease-in-out infinite;}
 @keyframes birdBob{0%,100%{transform:translateY(0) scale(1.1);}50%{transform:translateY(-8px) scale(1.15);}}
 .bird-photo{width:96px;height:96px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.18);
-box-shadow:0 4px 20px rgba(0,0,0,0.5);}
+  box-shadow:0 4px 20px rgba(0,0,0,0.5);}
 .bird-card.playing .bird-photo{border-color:var(--accent);box-shadow:0 0 20px rgba(126,184,154,0.4);}
 .bird-emoji-fallback{font-size:60px;filter:drop-shadow(0 4px 20px rgba(0,0,0,0.5));line-height:1;}
 .habitat-tag{position:absolute;top:12px;right:12px;z-index:2;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.5);background:rgba(0,0,0,0.3);padding:4px 8px;border:1px solid rgba(255,255,255,0.1);}
@@ -129,676 +135,476 @@ box-shadow:0 4px 20px rgba(0,0,0,0.5);}
 .bird-card.loading-sound .play-dot{animation:pulseDot 0.4s ease infinite;background:rgba(126,184,154,0.6);}
 @keyframes pulseDot{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.4);opacity:0.6;}}
 .play-text{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);}
+
+/* --- Toast notifications (replaces blocking alert()) --- */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-20px);z-index:200;
+  background:rgba(20,15,10,0.95);backdrop-filter:blur(14px);border:1px solid rgba(255,120,120,0.3);
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:12px 20px;border-radius:10px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.4);opacity:0;pointer-events:none;transition:all 0.3s ease;max-width:90vw;text-align:center;}
+.toast.visible{opacity:1;transform:translateX(-50%) translateY(0);}
+@media(max-width:600px){.toast{top:auto;bottom:90px;font-size:12px;padding:10px 16px;}}
 footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid var(--border);animation:fadeUp 0.8s 0.4s ease both;}
 .footer-text{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:rgba(232,224,212,0.2);letter-spacing:1px;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 @media(max-width:600px){
-header{padding-top:200px;}
-.birds-grid{grid-template-columns:repeat(2,1fr);}.bird-photo{width:64px;height:64px;}.bird-emoji-fallback{font-size:42px;}.bird-common{font-size:16px;}
-.now-playing{padding:12px 16px;}.np-name{font-size:15px;}
-.featured-inner{flex-direction:column;}
-.featured-left{width:100%;flex-direction:row;gap:16px;padding:16px 18px;border-right:none;border-bottom:1px solid var(--border);}
-.featured-photo{width:56px;height:56px;}.featured-photo-wrap{animation:none;}.featured-bird-name{font-size:16px;text-align:left;margin-top:0;}
-.featured-bird-hindi{text-align:left;}.featured-right{padding:16px 18px;}.featured-fact{font-size:14px;}
+  header{padding-top:200px;}
+  .birds-grid{grid-template-columns:repeat(2,1fr);}.bird-photo{width:64px;height:64px;}.bird-emoji-fallback{font-size:42px;}.bird-common{font-size:16px;}
+  .now-playing{padding:12px 16px;}.np-name{font-size:15px;}
+  .featured-inner{flex-direction:column;}
+  .featured-left{width:100%;flex-direction:row;gap:16px;padding:16px 18px;border-right:none;border-bottom:1px solid var(--border);}
+  .featured-photo{width:56px;height:56px;}.featured-photo-wrap{animation:none;}.featured-bird-name{font-size:16px;text-align:left;margin-top:0;}
+  .featured-bird-hindi{text-align:left;}.featured-right{padding:16px 18px;}.featured-fact{font-size:14px;}
 }
 @media(max-width:380px){.birds-grid{grid-template-columns:1fr;}}
 </style>
+</head>
+<body>
+<div class="bg-layer bg-default"></div>
+<div class="bg-layer bg-active" id="bgActive"></div>
+<div class="particles" id="particles"></div>
+<div class="ripple-container" id="rippleContainer"></div>
+<svg class="bird-silhouette" style="top:15%;--flydip:-20px;animation-duration:18s;" viewBox="0 0 80 40" width="80" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 20 Q10 8 20 20 Q30 8 40 20 M40 20 Q50 8 60 20 Q70 8 80 20" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+<svg class="bird-silhouette" style="top:35%;--flydip:15px;animation-duration:24s;animation-delay:-8s;" viewBox="0 0 60 30" width="50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 15 Q7.5 6 15 15 Q22.5 6 30 15 M30 15 Q37.5 6 45 15 Q52.5 6 60 15" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
 
-</head>  
-<body>  
-<div class="bg-layer bg-default"></div>  
-<div class="bg-layer bg-active" id="bgActive"></div>  
-<div class="particles" id="particles"></div>  
-<div class="ripple-container" id="rippleContainer"></div>  
-<svg class="bird-silhouette" style="top:15%;--flydip:-20px;animation-duration:18s;" viewBox="0 0 80 40" width="80" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 20 Q10 8 20 20 Q30 8 40 20 M40 20 Q50 8 60 20 Q70 8 80 20" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>  
-<svg class="bird-silhouette" style="top:35%;--flydip:15px;animation-duration:24s;animation-delay:-8s;" viewBox="0 0 60 30" width="50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 15 Q7.5 6 15 15 Q22.5 6 30 15 M30 15 Q37.5 6 45 15 Q52.5 6 60 15" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>  <div class="ambience-panel">  
-  <div class="panel-section">  
-    <div class="ambience-label">Ambience</div>  
-    <div class="ambience-buttons" id="ambienceButtons"></div>  
-  </div>  
-  <div class="panel-divider"></div>  
-  <div class="panel-section">  
-    <div class="ambience-label">Instruments</div>  
-    <div class="ambience-buttons" id="instrumentButtons"></div>  
+<div class="ambience-panel">
+  <div class="panel-section">
+    <div class="ambience-label">Ambience</div>
+    <div class="ambience-buttons" id="ambienceButtons"></div>
   </div>
   <div class="panel-divider"></div>
   <div class="panel-section">
-    <div class="ambience-label">Talk to Tota</div>
-    <button type="button" class="tota-talk-btn" id="totaTalkBtn"
-      onpointerdown="startTotaTalk(event)" onpointerup="stopTotaTalk(event)"
-      onpointerleave="if(isRecordingTota) stopTotaTalk(event)"
-      onpointercancel="if(isRecordingTota) stopTotaTalk(event)"
-      aria-label="Hold to speak to Tota the parrot">
-      <span id="totaTalkIcon">🦜</span>
-      <span id="totaTalkLabel">Hold &amp; Speak</span>
-    </button>
-    <div class="tota-hint" id="totaHint">Hold the button, speak, then release — Tota will mimic you like a real Indian parrot</div>
+    <div class="ambience-label">Instruments</div>
+    <div class="ambience-buttons" id="instrumentButtons"></div>
   </div>
-</div>  <div class="wrap">  
-  <header>  
-    <div class="header-eyebrow">Indian Bird Sound Library</div>  
-    <h1 class="header-title">पक्षी<br/><em>Pakshi</em></h1>  
-    <div class="header-hindi">The voices of Indian birds</div>  
-    <div class="header-divider"><div class="hdline"></div><div class="hddot"></div><div class="hdline"></div></div>  
-  </header>    <div class="featured-panel" id="featuredPanel">  
-    <div class="featured-inner">  
-      <div class="featured-left">  
-        <div class="featured-photo-wrap">  
-          <div class="featured-emoji-fallback" id="featuredEmojiFallback">🐦</div>  
-        </div>  
-        <div class="featured-bird-name" id="featuredName">—</div>  
-        <div class="featured-bird-hindi" id="featuredHindi">—</div>  
-        <div class="featured-habitat" id="featuredHabitat">—</div>  
-      </div>  
-      <div class="featured-right">  
-        <div class="featured-label">◆ Did you know</div>  
-        <div class="featured-fact" id="featuredFact">—</div>  
-        <div class="featured-scientific" id="featuredScientific">—</div>  
-      </div>  
-    </div>  
-  </div>    <div class="grid-label">◆ Tap a bird to hear its call</div>  
-  <div class="birds-grid" id="birdsGrid"></div>    <footer><div class="footer-text">"In every walk with nature, one receives far more than he seeks." — John Muir</div></footer>  
-</div>  <div class="now-playing" id="nowPlaying">  
-  <div class="np-wave"><div class="np-bar"></div><div class="np-bar"></div><div class="np-bar"></div><div class="np-bar"></div><div class="np-bar"></div></div>  
-  <div class="np-info"><div class="np-name" id="npName">—</div><div class="np-sub" id="npSub">Now playing</div></div>  
-  <button type="button" class="np-stop" onclick="stopAll()">■ Stop</button>  
-</div>  <script>  
-// Bird sounds are loaded from the assets folder (e.g. assets/koel.mp3).  
-// Ambience sounds need these files added to the assets folder:  
-//   assets/rain.mp3, assets/wind.mp3, assets/water.mp3, assets/bugs.mp3  
-// Instrument sounds need these files added to the assets folder:  
-//   assets/flute.mp3, assets/guitar.mp3, assets/piano.mp3, assets/sitar.mp3  
-  
-const BIRDS = [  
-  { id:'koel', common:'Asian Koel', hindi:'कोयल (Koyal)', scientific:'Eudynamys scolopaceus', emoji:'🐦', habitat:'Woodland',  
-    fact:"The Koel's haunting call is the sound of Indian spring. Only the male sings.",   
-    sound:'assets/koel.mp3',  
-    bg:'linear-gradient(160deg,#0a1f0a 0%,#1a3d1a 40%,#0d2a1a 100%)', bgGlow:'rgba(30,100,30,0.35)', particleColor:'#4CAF50',  
-    cardBg:'linear-gradient(135deg,#1a3d1a,#0a1f0a)' },  
-  
-  { id:'peacock', common:'Indian Peacock', hindi:'मोर (Mor)', scientific:'Pavo cristatus', emoji:'🦚', habitat:'Forest & Farm',  
-    fact:"India's national bird. The dramatic call signals the monsoon.",  
-    sound:'assets/peacock.mp3',  
-    bg:'linear-gradient(160deg,#0a0f1f 0%,#1a1f3d 40%,#0d1a2a 100%)', bgGlow:'rgba(30,50,150,0.3)', particleColor:'#3F51B5',  
-    cardBg:'linear-gradient(135deg,#1a1f3d,#0a0f1f)' },  
-  
-  { id:'mynah', common:'Common Myna', hindi:'मैना (Maina)', scientific:'Acridotheres tristis', emoji:'🐤', habitat:'Urban & Rural',  
-    fact:"One of the world's most intelligent birds — mimics human speech.",  
-    sound:'assets/mynah.mp3',  
-    bg:'linear-gradient(160deg,#1a1000 0%,#3d2800 40%,#2a1a00 100%)', bgGlow:'rgba(150,100,0,0.3)', particleColor:'#FF9800',  
-    cardBg:'linear-gradient(135deg,#3d2800,#1a1000)' },  
-  
-  { id:'sparrow', common:'House Sparrow', hindi:'गौरैया (Gauraiya)', scientific:'Passer domesticus', emoji:'🐦', habitat:'Urban',  
-    fact:"Once India's most common city bird, now declining due to mobile towers.",  
-    sound:'assets/sparrow.mp3',  
-    bg:'linear-gradient(160deg,#1a1208 0%,#2e2010 40%,#1a1208 100%)', bgGlow:'rgba(120,80,30,0.3)', particleColor:'#A1887F',  
-    cardBg:'linear-gradient(135deg,#2e2010,#1a1208)' },  
-  
-  { id:'kingfisher', common:'Common Kingfisher', hindi:'राम चिरैया', scientific:'Alcedo atthis', emoji:'🦜', habitat:'Riverbank',  
-    fact:"Dives at 40 km/h. Its beak inspired Japan's bullet train.",  
-    sound:'assets/kingfisher.mp3',  
-    bg:'linear-gradient(160deg,#001a2a 0%,#003d5c 40%,#001f3a 100%)', bgGlow:'rgba(0,100,200,0.35)', particleColor:'#03A9F4',  
-    cardBg:'linear-gradient(135deg,#003d5c,#001a2a)' },  
-  
-  { id:'owl', common:'Indian Scops Owl', hindi:'उल्लू (Ullu)', scientific:'Otus bakkamoena', emoji:'🦉', habitat:'Night Forest',  
-    fact:"Can rotate head 270°. Symbol of wisdom and Goddess Lakshmi.",  
-    sound:'assets/owl.mp3',  
-    bg:'linear-gradient(160deg,#050510 0%,#0a0a20 40%,#080814 100%)', bgGlow:'rgba(80,0,180,0.25)', particleColor:'#9C27B0',  
-    cardBg:'linear-gradient(135deg,#0a0a20,#050510)' },  
-  
-  { id:'flamingo', common:'Greater Flamingo', hindi:'राजहंस', scientific:'Phoenicopterus roseus', emoji:'🦩', habitat:'Wetlands',  
-    fact:"Pink colour comes from algae. Over a million visit Mumbai every winter.",  
-    sound:'assets/flamingo.mp3',  
-    bg:'linear-gradient(160deg,#1a0a10 0%,#3d1a28 40%,#2a0f1a 100%)', bgGlow:'rgba(220,80,120,0.3)', particleColor:'#E91E63',  
-    cardBg:'linear-gradient(135deg,#3d1a28,#1a0a10)' },  
-  
-  { id:'eagle', common:'Crested Serpent Eagle', hindi:'बाज (Baaz)', scientific:'Spilornis cheela', emoji:'🦅', habitat:'Dense Forest',  
-    fact:"Specialises in hunting snakes. Inspired Garuda in Indian emblem.",  
-    sound:'assets/eagle.mp3',  
-    bg:'linear-gradient(160deg,#100800 0%,#2a1800 40%,#1a1000 100%)', bgGlow:'rgba(180,100,0,0.3)', particleColor:'#FF6F00',  
-    cardBg:'linear-gradient(135deg,#2a1800,#100800)' },  
-  
-  { id:'crane', common:'Sarus Crane', hindi:'सारस (Saras)', scientific:'Antigone antigone', emoji:'🕊️', habitat:'Wetland & Field',  
-    fact:"World's tallest flying bird. Mate for life. Inspired first Sanskrit verse.",  
-    sound:'assets/crane.mp3',  
-    bg:'linear-gradient(160deg,#0a1a0a 0%,#1a3a0a 40%,#0f2a0f 100%)', bgGlow:'rgba(100,180,50,0.25)', particleColor:'#8BC34A',  
-    cardBg:'linear-gradient(135deg,#1a3a0a,#0a1a0a)' },  
-  
-  { id:'hornbill', common:'Great Hornbill', hindi:'धनेश (Dhanesh)', scientific:'Buceros bicornis', emoji:'🦜', habitat:'Tropical Forest',  
-    fact:"Hollow casque amplifies calls. State bird of Kerala & Arunachal.",  
-    sound:'assets/hornbill.mp3',  
-    bg:'linear-gradient(160deg,#001a00 0%,#003300 40%,#001a08 100%)', bgGlow:'rgba(0,150,50,0.3)', particleColor:'#FFEB3B',  
-    cardBg:'linear-gradient(135deg,#003300,#001a00)' },  
-  
-  { id:'sunbird', common:'Purple Sunbird', hindi:'शक्कर खोरा', scientific:'Cinnyris asiaticus', emoji:'🐦', habitat:'Garden & Grove',  
-    fact:"India's hummingbird. Important pollinator of garden flowers.",  
-    sound:'assets/sunbird.mp3',  
-    bg:'linear-gradient(160deg,#0f001f 0%,#1f003f 40%,#180030 100%)', bgGlow:'rgba(120,0,200,0.3)', particleColor:'#7B1FA2',  
-    cardBg:'linear-gradient(135deg,#1f003f,#0f001f)' },  
-  
-  { id:'bulbul', common:'Red-whiskered Bulbul', hindi:'बुलबुल (Bulbul)', scientific:'Pycnonotus jocosus', emoji:'🐤', habitat:'Garden & Scrub',  
-    fact:"Poet's bird of India. Symbol of soul's longing in Sufi poetry.",  
-    sound:'assets/bulbul.mp3',  
-    bg:'linear-gradient(160deg,#1a0800 0%,#3d1800 40%,#2a1000 100%)', bgGlow:'rgba(200,80,0,0.3)', particleColor:'#FF5722',  
-    cardBg:'linear-gradient(135deg,#3d1800,#1a0800)' },  
-  
-  { id:'parakeet', common:'Rose-ringed Parakeet', hindi:'तोता (Tota)', scientific:'Psittacula krameri', emoji:'🦜', habitat:'Urban & Garden',  
-    fact:"India's most familiar parrot. Famous for mimicking human speech and raiding orchards in noisy flocks.",  
-    sound:'assets/parakeet.mp3',  
-    bg:'linear-gradient(160deg,#001f0a 0%,#00401a 40%,#00250f 100%)', bgGlow:'rgba(0,180,80,0.3)', particleColor:'#00C853',  
-    cardBg:'linear-gradient(135deg,#00401a,#001f0a)' },  
-  
-  { id:'barbet', common:'Coppersmith Barbet', hindi:'छोटा बसंत (Chota Basant)', scientific:'Psilopogon haemacephalus', emoji:'🐦', habitat:'Garden & Orchard',  
-    fact:"Named for its metallic 'tuk-tuk-tuk' call, said to sound like a coppersmith hammering metal.",  
-    sound:'assets/barbet.mp3',  
-    bg:'linear-gradient(160deg,#1f0505 0%,#3d0a0a 40%,#2a0808 100%)', bgGlow:'rgba(200,30,30,0.3)', particleColor:'#E53935',  
-    cardBg:'linear-gradient(135deg,#3d0a0a,#1f0505)' },  
-  
-  { id:'robin', common:'Indian Robin', hindi:'कालचिड़ी (Kalchidi)', scientific:'Copsychus fuscatus', emoji:'🐦', habitat:'Scrub & Garden',  
-    fact:"A confident little singer that cocks its tail upright while delivering cheerful, whistling songs.",  
-    sound:'assets/robin.mp3',  
-    bg:'linear-gradient(160deg,#0a0a0a 0%,#1f1f1f 40%,#151515 100%)', bgGlow:'rgba(150,150,150,0.25)', particleColor:'#B0BEC5',  
-    cardBg:'linear-gradient(135deg,#1f1f1f,#0a0a0a)' },  
-  
-  { id:'babbler', common:'Jungle Babbler', hindi:'सात भाई (Saat Bhai)', scientific:'Argya striata', emoji:'🐦', habitat:'Garden & Scrub',  
-    fact:"Almost always seen in noisy groups of six or seven, earning it the nickname 'Seven Sisters/Brothers'.",  
-    sound:'assets/babbler.mp3',  
-    bg:'linear-gradient(160deg,#1a1608 0%,#3d3410 40%,#2a2408 100%)', bgGlow:'rgba(180,150,30,0.3)', particleColor:'#C0A030',  
-    cardBg:'linear-gradient(135deg,#3d3410,#1a1608)' },  
-  
-  { id:'woodpecker', common:'Black-rumped Flameback', hindi:'कठफोड़वा (Kathphodwa)', scientific:'Dinopium benghalense', emoji:'🐦', habitat:'Forest & Garden',  
-    fact:"Drums up to 20 times a second on tree trunks — a form of communication, not just insect hunting.",  
-    sound:'assets/woodpecker.mp3',  
-    bg:'linear-gradient(160deg,#150f00 0%,#332200 40%,#1f1600 100%)', bgGlow:'rgba(220,160,0,0.3)', particleColor:'#FFC107',  
-    cardBg:'linear-gradient(135deg,#332200,#150f00)' },  
-  
-  { id:'pigeon', common:'Rock Pigeon', hindi:'कबूतर (Kabootar)', scientific:'Columba livia', emoji:'🐦', habitat:'Urban',  
-    fact:"India's most familiar city bird. Descended from wild Rock Doves once used to carry messages across kingdoms.",  
-    sound:'assets/pigeon.mp3',  
-    bg:'linear-gradient(160deg,#0a1420 0%,#1a2e40 40%,#0f1c2a 100%)', bgGlow:'rgba(90,130,170,0.3)', particleColor:'#78909C',  
-    cardBg:'linear-gradient(135deg,#1a2e40,#0a1420)' },  
-  
-  { id:'crow', common:'House Crow', hindi:'कौआ (Kawa)', scientific:'Corvus splendens', emoji:'🐦‍⬛', habitat:'Urban & Rural',  
-    fact:"Revered in Hindu tradition as messengers to ancestors during Shraddha rituals. Remarkably intelligent and social.",  
-    sound:'assets/crow.mp3',  
-    bg:'linear-gradient(160deg,#050505 0%,#12121a 40%,#08080c 100%)', bgGlow:'rgba(60,60,90,0.3)', particleColor:'#546E7A',  
-    cardBg:'linear-gradient(135deg,#12121a,#050505)' }  
-];  
-  
-let currentAudio = null;  
-let currentBirdId = null;  
-  
-// --- Layered sounds (independent of bird playback, and independent of each other) ---  
-// Two groups share the exact same toggle/fade/loop behavior — add more sounds to  
-// either group any time, the panel and logic are fully generic.  
-const SOUND_GROUPS = [  
-  {  
-    key: 'ambience', containerId: 'ambienceButtons',  
-    sounds: [  
-      { id:'rain',  label:'Rain',  icon:'🌧️', file:'assets/rain.mp3',  volume:0.35 },  
-      { id:'wind',  label:'Wind',  icon:'💨', file:'assets/wind.mp3',  volume:0.30 },  
-      { id:'water', label:'Water', icon:'🌊', file:'assets/water.mp3', volume:0.30 },  
-      { id:'bugs',  label:'Bugs',  icon:'🦗', file:'assets/bugs.mp3',  volume:0.25 }  
-    ]  
-  },  
-  {  
-    key: 'instruments', containerId: 'instrumentButtons',  
-    sounds: [  
-      { id:'flute',  label:'Flute',  icon:'🪈', file:'assets/flute.mp3',  volume:0.30 },  
-      { id:'guitar', label:'Guitar', icon:'🎸', file:'assets/guitar.mp3', volume:0.30 },  
-      { id:'piano',  label:'Piano',  icon:'🎹', file:'assets/piano.mp3',  volume:0.30 },  
-      { id:'sitar',  label:'Sitar',  icon:'🎶', file:'assets/sitar.mp3',  volume:0.30 }  
-    ]  
-  }  
-];  
-const ALL_SOUNDS = SOUND_GROUPS.flatMap(g => g.sounds); // flat lookup list, ids are unique across groups  
-  
-let ambientAudios = {}; // id -> Audio instance (created lazily on first toggle)  
-let ambientOn = {};     // id -> boolean  
-  
-function renderAmbience() {  
-  SOUND_GROUPS.forEach(group => {  
-    document.getElementById(group.containerId).innerHTML = group.sounds.map(a => `  
-      <button class="ambience-btn" id="amb-btn-${a.id}" onclick="toggleAmbient('${a.id}')" aria-label="Toggle ${a.label}" aria-pressed="false">  
-        <span class="amb-icon">${a.icon}</span><span>${a.label}</span>  
-      </button>`).join('');  
-  });  
-}  
-  
-function toggleAmbient(id) {  
-  const conf = ALL_SOUNDS.find(a => a.id === id);  
-  if (!conf) return;  
-  const btn = document.getElementById('amb-btn-' + id);  
-  const isOn = !!ambientOn[id];  
-  
-  if (!isOn) {  
-    if (!ambientAudios[id]) {  
-      const audio = new Audio(conf.file);  
-      audio.loop = true;  
-      audio.volume = 0;  
-      audio.addEventListener('error', () => {  
-        alert("Sorry, " + conf.label + " sound couldn't be loaded. Make sure " + conf.file + " exists.");  
-        audio.pause();  
-        delete ambientAudios[id];  
-        ambientOn[id] = false;  
-        btn.classList.remove('active');  
-        btn.setAttribute('aria-pressed', 'false');  
-      });  
-      ambientAudios[id] = audio;  
-    }  
-    const audio = ambientAudios[id];  
-    audio.play().catch(() => {  
-      // Autoplay was blocked — shouldn't normally happen since this runs from a click.  
-    });  
-    fadeAudio(audio, audio.volume, conf.volume, 800);  
-    ambientOn[id] = true;  
-    btn.classList.add('active');  
-    btn.setAttribute('aria-pressed', 'true');  
-  } else {  
-    const audio = ambientAudios[id];  
-    fadeAudio(audio, audio.volume, 0, 600, () => audio.pause());  
-    ambientOn[id] = false;  
-    btn.classList.remove('active');  
-    btn.setAttribute('aria-pressed', 'false');  
-  }  
-}  
-  
-function fadeAudio(audio, from, to, duration, onDone) {  
-  if (audio._fadeInterval) clearInterval(audio._fadeInterval);  
-  const steps = 20;  
-  const stepTime = duration / steps;  
-  let i = 0;  
-  audio._fadeInterval = setInterval(() => {  
-    i++;  
-    audio.volume = Math.max(0, Math.min(1, from + (to - from) * (i / steps)));  
-    if (i >= steps) {  
-      clearInterval(audio._fadeInterval);  
-      audio._fadeInterval = null;  
-      if (onDone) onDone();  
-    }  
-  }, stepTime);  
-}  
-  
-function renderGrid() {  
-  document.getElementById('birdsGrid').innerHTML = BIRDS.map(b => `  
-    <div class="bird-card" id="card-${b.id}" onclick="playBird('${b.id}')" style="--card-bg:${b.cardBg}">  
-      <div class="habitat-tag">${b.habitat}</div>  
-      <div class="bird-photo-wrap">  
-        <div class="bird-emoji-fallback">${b.emoji}</div>  
-      </div>  
-      <div class="bird-info">  
-        <div class="bird-common">${b.common}</div>  
-        <div class="bird-hindi">${b.hindi}</div>  
-        <div class="bird-scientific">${b.scientific}</div>  
-        <div class="play-indicator">  
-          <div class="play-dot"></div>  
-          <div class="play-text" id="playtxt-${b.id}">Tap to play</div>  
-        </div>  
-      </div>  
-    </div>`).join('');  
-}  
-  
-function playBird(id) {  
-  const bird = BIRDS.find(b => b.id === id);  
-  if (!bird) return;  
-  if (currentBirdId === id) { stopAll(); return; }  
-  
-  if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }  
-  document.querySelectorAll('.bird-card').forEach(c => c.classList.remove('playing','loading-sound'));  
-  document.querySelectorAll('[id^="playtxt-"]').forEach(t => t.textContent = 'Tap to play');  
-  
-  currentBirdId = id;  
-  const card = document.getElementById('card-'+id);  
-  card.classList.add('loading-sound');  
-  document.getElementById('playtxt-'+id).textContent = 'Loading...';  
-  
-  showFeatured(bird);  
-  updateBackground(bird);  
-  spawnRipple(card);  
-  document.querySelectorAll('.bird-silhouette').forEach(s => s.classList.add('active'));  
-  
-  const audio = new Audio(bird.sound);  
-  audio.addEventListener('canplaythrough', () => {  
-    currentAudio = audio;  
-    card.classList.remove('loading-sound');  
-    card.classList.add('playing');  
-    document.getElementById('playtxt-'+id).textContent = 'Now playing...';  
-    document.getElementById('npName').textContent = bird.common;  
-    document.getElementById('npSub').textContent = bird.hindi + ' · ' + bird.habitat;  
-    document.getElementById('nowPlaying').classList.add('visible');  
-    audio.play();  
-  }, { once: true });  
-  
-  audio.addEventListener('ended', () => stopAll());  
-  audio.addEventListener('error', () => {  
-    card.classList.remove('loading-sound');  
-    alert("Sorry, sound failed to load for " + bird.common);  
-  });  
-}  
-  
-function stopAll() {  
-  // Note: this intentionally does NOT touch ambientAudios — ambience sounds keep playing.  
-  if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; }  
-  currentBirdId = null;  
-  document.querySelectorAll('.bird-card').forEach(c => c.classList.remove('playing','loading-sound'));  
-  document.querySelectorAll('[id^="playtxt-"]').forEach(t => t.textContent = 'Tap to play');  
-  document.getElementById('nowPlaying').classList.remove('visible');  
-  document.getElementById('featuredPanel').classList.remove('visible');  
-  document.querySelectorAll('.bird-silhouette').forEach(s => s.classList.remove('active'));  
-  document.getElementById('bgActive').style.opacity = '0';  
-}  
-  
-function updateBackground(bird) {  
-  const bg = document.getElementById('bgActive');  
-  bg.style.background = `${bird.bg},radial-gradient(ellipse at 30% 40%, ${bird.bgGlow} 0%,transparent 55%)`;  
-  bg.style.opacity = '1';  
-  spawnParticles(bird.particleColor);  
-}  
-  
-function spawnParticles(color) {  
-  const c = document.getElementById('particles');  
-  c.innerHTML = '';  
-  for (let i = 0; i < 18; i++) {  
-    const p = document.createElement('div');  
-    p.className = 'particle';  
-    const s = Math.random()*4+2;  
-    p.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;background:${color};--drift:${(Math.random()-0.5)*200}px;animation-duration:${Math.random()*8+6}s;animation-delay:${Math.random()*4}s;`;  
-    c.appendChild(p);  
-  }  
-}  
-  
-function spawnRipple(card) {  
-  const c = document.getElementById('rippleContainer');  
-  const r = card.getBoundingClientRect();  
-  for (let i = 0; i < 3; i++) {  
-    setTimeout(() => {  
-      const el = document.createElement('div');  
-      el.className = 'ripple';  
-      el.style.left = (r.left + r.width/2) + 'px';  
-      el.style.top = (r.top + r.height/2) + 'px';  
-      el.style.animationDelay = (i*0.4)+'s';  
-      c.appendChild(el);  
-      setTimeout(() => el.remove(), 3500);  
-    }, i*300);  
-  }  
-}  
-  
-function showFeatured(bird) {  
-  const panel = document.getElementById('featuredPanel');  
-  panel.classList.remove('visible');  
-  setTimeout(() => {  
-    const fallback = document.getElementById('featuredEmojiFallback');  
-    fallback.textContent = bird.emoji;  
-  
-    document.getElementById('featuredName').textContent = bird.common;  
-    document.getElementById('featuredHindi').textContent = bird.hindi;  
-    document.getElementById('featuredHabitat').textContent = bird.habitat;  
-    document.getElementById('featuredFact').textContent = bird.fact;  
-    document.getElementById('featuredScientific').textContent = bird.scientific;  
-    panel.classList.add('visible');  
-  }, 80);  
-}  
-  
-// ========== Talk to Tota (parrot mimic) ==========
-// Records a short phrase from the mic, then plays it back with higher pitch
-// + mild high-shelf EQ so it sounds like a lively Rose-ringed Parakeet (Tota),
-// not a compressed or robotic human voice.
+</div>
 
-let isRecordingTota = false;
-let mediaRecorder = null;
-let mediaStream = null;
-let recordedChunks = [];
-let audioCtx = null;
-let currentMimicSource = null;
+<div class="wrap">
+  <header>
+    <div class="header-eyebrow">Indian Bird Sound Library</div>
+    <h1 class="header-title">पक्षी<br/><em>Pakshi</em></h1>
+    <div class="header-hindi">The voices of Indian birds</div>
+    <div class="header-divider"><div class="hdline"></div><div class="hddot"></div><div class="hdline"></div></div>
+  </header>
+  
+  <div class="featured-panel" id="featuredPanel">
+    <div class="featured-inner">
+      <div class="featured-left">
+        <div class="featured-photo-wrap">
+          <div class="featured-emoji-fallback" id="featuredEmojiFallback">🐦</div>
+        </div>
+        <div class="featured-bird-name" id="featuredName">—</div>
+        <div class="featured-bird-hindi" id="featuredHindi">—</div>
+        <div class="featured-habitat" id="featuredHabitat">—</div>
+      </div>
+      <div class="featured-right">
+        <div class="featured-label">◆ Did you know</div>
+        <div class="featured-fact" id="featuredFact">—</div>
+        <div class="featured-scientific" id="featuredScientific">—</div>
+      </div>
+    </div>
+  </div>
 
-const TOTA_BIRD = BIRDS.find(b => b.id === 'parakeet');
+  <div class="grid-label">◆ Tap a bird to hear its call</div>
+  <div class="search-row">
+    <input type="text" id="birdSearch" class="bird-search" placeholder="Search by name, Hindi name, or habitat…" autocomplete="off" oninput="filterBirds(this.value)"/>
+    <div class="search-count" id="searchCount"></div>
+  </div>
+  <div class="birds-grid" id="birdsGrid"></div>
+  <div class="no-results" id="noResults" style="display:none">No birds match your search.</div>
+  
+  <footer><div class="footer-text">"In every walk with nature, one receives far more than he seeks." — John Muir</div></footer>
+</div>
 
-function getAudioContext() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-  return audioCtx;
+<div class="toast" id="toast"></div>
+
+<div class="now-playing" id="nowPlaying">
+  <div class="np-wave"><div class="np-bar"></div><div class="np-bar"></div><div class="np-bar"></div><div class="np-bar"></div><div class="np-bar"></div></div>
+  <div class="np-info"><div class="np-name" id="npName">—</div><div class="np-sub" id="npSub">Now playing</div></div>
+  <button type="button" class="np-stop" onclick="stopAll()">■ Stop</button>
+</div>
+
+<script>
+// Bird sounds are loaded from the assets folder (e.g. assets/koel.mp3).
+// Ambience sounds need these files added to the assets folder:
+//   assets/rain.mp3, assets/wind.mp3, assets/water.mp3, assets/bugs.mp3
+// Instrument sounds need these files added to the assets folder:
+//   assets/flute.mp3, assets/guitar.mp3, assets/piano.mp3, assets/sitar.mp3
+
+let toastTimer = null;
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.add('visible');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('visible'), 3500);
 }
 
-async function startTotaTalk(e) {
-  if (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    // Capture pointer so release is received even if finger/mouse moves off the button
-    if (e.pointerId != null && e.target && e.target.setPointerCapture) {
-      try { e.target.setPointerCapture(e.pointerId); } catch (_) {}
-    }
-  }
-  if (isRecordingTota) return;
+const BIRDS = [
+  { id:'koel', common:'Asian Koel', hindi:'कोयल (Koyal)', scientific:'Eudynamys scolopaceus', emoji:'🐦', habitat:'Woodland',
+    fact:"The Koel's haunting call is the sound of Indian spring. Only the male sings.", 
+    sound:'assets/koel.mp3',
+    bg:'linear-gradient(160deg,#0a1f0a 0%,#1a3d1a 40%,#0d2a1a 100%)', bgGlow:'rgba(30,100,30,0.35)', particleColor:'#4CAF50',
+    cardBg:'linear-gradient(135deg,#1a3d1a,#0a1f0a)' },
 
-  // Stop any currently playing bird call so the mimic is clear
-  if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.currentTime = 0;
-    currentAudio = null;
+  { id:'peacock', common:'Indian Peacock', hindi:'मोर (Mor)', scientific:'Pavo cristatus', emoji:'🦚', habitat:'Forest & Farm',
+    fact:"India's national bird. The dramatic call signals the monsoon.",
+    sound:'assets/peacock.mp3',
+    bg:'linear-gradient(160deg,#0a0f1f 0%,#1a1f3d 40%,#0d1a2a 100%)', bgGlow:'rgba(30,50,150,0.3)', particleColor:'#3F51B5',
+    cardBg:'linear-gradient(135deg,#1a1f3d,#0a0f1f)' },
+
+  { id:'mynah', common:'Common Myna', hindi:'मैना (Maina)', scientific:'Acridotheres tristis', emoji:'🐤', habitat:'Urban & Rural',
+    fact:"One of the world's most intelligent birds — mimics human speech.",
+    sound:'assets/mynah.mp3',
+    bg:'linear-gradient(160deg,#1a1000 0%,#3d2800 40%,#2a1a00 100%)', bgGlow:'rgba(150,100,0,0.3)', particleColor:'#FF9800',
+    cardBg:'linear-gradient(135deg,#3d2800,#1a1000)' },
+
+  { id:'sparrow', common:'House Sparrow', hindi:'गौरैया (Gauraiya)', scientific:'Passer domesticus', emoji:'🐦', habitat:'Urban',
+    fact:"Once India's most common city bird, now declining due to mobile towers.",
+    sound:'assets/sparrow.mp3',
+    bg:'linear-gradient(160deg,#1a1208 0%,#2e2010 40%,#1a1208 100%)', bgGlow:'rgba(120,80,30,0.3)', particleColor:'#A1887F',
+    cardBg:'linear-gradient(135deg,#2e2010,#1a1208)' },
+
+  { id:'kingfisher', common:'Common Kingfisher', hindi:'राम चिरैया', scientific:'Alcedo atthis', emoji:'🦜', habitat:'Riverbank',
+    fact:"Dives at 40 km/h. Its beak inspired Japan's bullet train.",
+    sound:'assets/kingfisher.mp3',
+    bg:'linear-gradient(160deg,#001a2a 0%,#003d5c 40%,#001f3a 100%)', bgGlow:'rgba(0,100,200,0.35)', particleColor:'#03A9F4',
+    cardBg:'linear-gradient(135deg,#003d5c,#001a2a)' },
+
+  { id:'owl', common:'Indian Scops Owl', hindi:'उल्लू (Ullu)', scientific:'Otus bakkamoena', emoji:'🦉', habitat:'Night Forest',
+    fact:"Can rotate head 270°. Symbol of wisdom and Goddess Lakshmi.",
+    sound:'assets/owl.mp3',
+    bg:'linear-gradient(160deg,#050510 0%,#0a0a20 40%,#080814 100%)', bgGlow:'rgba(80,0,180,0.25)', particleColor:'#9C27B0',
+    cardBg:'linear-gradient(135deg,#0a0a20,#050510)' },
+
+  { id:'flamingo', common:'Greater Flamingo', hindi:'राजहंस', scientific:'Phoenicopterus roseus', emoji:'🦩', habitat:'Wetlands',
+    fact:"Pink colour comes from algae. Over a million visit Mumbai every winter.",
+    sound:'assets/flamingo.mp3',
+    bg:'linear-gradient(160deg,#1a0a10 0%,#3d1a28 40%,#2a0f1a 100%)', bgGlow:'rgba(220,80,120,0.3)', particleColor:'#E91E63',
+    cardBg:'linear-gradient(135deg,#3d1a28,#1a0a10)' },
+
+  { id:'eagle', common:'Crested Serpent Eagle', hindi:'बाज (Baaz)', scientific:'Spilornis cheela', emoji:'🦅', habitat:'Dense Forest',
+    fact:"Specialises in hunting snakes. Inspired Garuda in Indian emblem.",
+    sound:'assets/eagle.mp3',
+    bg:'linear-gradient(160deg,#100800 0%,#2a1800 40%,#1a1000 100%)', bgGlow:'rgba(180,100,0,0.3)', particleColor:'#FF6F00',
+    cardBg:'linear-gradient(135deg,#2a1800,#100800)' },
+
+  { id:'crane', common:'Sarus Crane', hindi:'सारस (Saras)', scientific:'Antigone antigone', emoji:'🕊️', habitat:'Wetland & Field',
+    fact:"World's tallest flying bird. Mate for life. Inspired first Sanskrit verse.",
+    sound:'assets/crane.mp3',
+    bg:'linear-gradient(160deg,#0a1a0a 0%,#1a3a0a 40%,#0f2a0f 100%)', bgGlow:'rgba(100,180,50,0.25)', particleColor:'#8BC34A',
+    cardBg:'linear-gradient(135deg,#1a3a0a,#0a1a0a)' },
+
+  { id:'hornbill', common:'Great Hornbill', hindi:'धनेश (Dhanesh)', scientific:'Buceros bicornis', emoji:'🦜', habitat:'Tropical Forest',
+    fact:"Hollow casque amplifies calls. State bird of Kerala & Arunachal.",
+    sound:'assets/hornbill.mp3',
+    bg:'linear-gradient(160deg,#001a00 0%,#003300 40%,#001a08 100%)', bgGlow:'rgba(0,150,50,0.3)', particleColor:'#FFEB3B',
+    cardBg:'linear-gradient(135deg,#003300,#001a00)' },
+
+  { id:'sunbird', common:'Purple Sunbird', hindi:'शक्कर खोरा', scientific:'Cinnyris asiaticus', emoji:'🐦', habitat:'Garden & Grove',
+    fact:"India's hummingbird. Important pollinator of garden flowers.",
+    sound:'assets/sunbird.mp3',
+    bg:'linear-gradient(160deg,#0f001f 0%,#1f003f 40%,#180030 100%)', bgGlow:'rgba(120,0,200,0.3)', particleColor:'#7B1FA2',
+    cardBg:'linear-gradient(135deg,#1f003f,#0f001f)' },
+
+  { id:'bulbul', common:'Red-whiskered Bulbul', hindi:'बुलबुल (Bulbul)', scientific:'Pycnonotus jocosus', emoji:'🐤', habitat:'Garden & Scrub',
+    fact:"Poet's bird of India. Symbol of soul's longing in Sufi poetry.",
+    sound:'assets/bulbul.mp3',
+    bg:'linear-gradient(160deg,#1a0800 0%,#3d1800 40%,#2a1000 100%)', bgGlow:'rgba(200,80,0,0.3)', particleColor:'#FF5722',
+    cardBg:'linear-gradient(135deg,#3d1800,#1a0800)' },
+
+  { id:'parakeet', common:'Rose-ringed Parakeet', hindi:'तोता (Tota)', scientific:'Psittacula krameri', emoji:'🦜', habitat:'Urban & Garden',
+    fact:"India's most familiar parrot. Famous for mimicking human speech and raiding orchards in noisy flocks.",
+    sound:'assets/parakeet.mp3',
+    bg:'linear-gradient(160deg,#001f0a 0%,#00401a 40%,#00250f 100%)', bgGlow:'rgba(0,180,80,0.3)', particleColor:'#00C853',
+    cardBg:'linear-gradient(135deg,#00401a,#001f0a)' },
+
+  { id:'barbet', common:'Coppersmith Barbet', hindi:'छोटा बसंत (Chota Basant)', scientific:'Psilopogon haemacephalus', emoji:'🐦', habitat:'Garden & Orchard',
+    fact:"Named for its metallic 'tuk-tuk-tuk' call, said to sound like a coppersmith hammering metal.",
+    sound:'assets/barbet.mp3',
+    bg:'linear-gradient(160deg,#1f0505 0%,#3d0a0a 40%,#2a0808 100%)', bgGlow:'rgba(200,30,30,0.3)', particleColor:'#E53935',
+    cardBg:'linear-gradient(135deg,#3d0a0a,#1f0505)' },
+
+  { id:'robin', common:'Indian Robin', hindi:'कालचिड़ी (Kalchidi)', scientific:'Copsychus fuscatus', emoji:'🐦', habitat:'Scrub & Garden',
+    fact:"A confident little singer that cocks its tail upright while delivering cheerful, whistling songs.",
+    sound:'assets/robin.mp3',
+    bg:'linear-gradient(160deg,#0a0a0a 0%,#1f1f1f 40%,#151515 100%)', bgGlow:'rgba(150,150,150,0.25)', particleColor:'#B0BEC5',
+    cardBg:'linear-gradient(135deg,#1f1f1f,#0a0a0a)' },
+
+  { id:'babbler', common:'Jungle Babbler', hindi:'सात भाई (Saat Bhai)', scientific:'Argya striata', emoji:'🐦', habitat:'Garden & Scrub',
+    fact:"Almost always seen in noisy groups of six or seven, earning it the nickname 'Seven Sisters/Brothers'.",
+    sound:'assets/babbler.mp3',
+    bg:'linear-gradient(160deg,#1a1608 0%,#3d3410 40%,#2a2408 100%)', bgGlow:'rgba(180,150,30,0.3)', particleColor:'#C0A030',
+    cardBg:'linear-gradient(135deg,#3d3410,#1a1608)' },
+
+  { id:'woodpecker', common:'Black-rumped Flameback', hindi:'कठफोड़वा (Kathphodwa)', scientific:'Dinopium benghalense', emoji:'🐦', habitat:'Forest & Garden',
+    fact:"Drums up to 20 times a second on tree trunks — a form of communication, not just insect hunting.",
+    sound:'assets/woodpecker.mp3',
+    bg:'linear-gradient(160deg,#150f00 0%,#332200 40%,#1f1600 100%)', bgGlow:'rgba(220,160,0,0.3)', particleColor:'#FFC107',
+    cardBg:'linear-gradient(135deg,#332200,#150f00)' },
+
+  { id:'pigeon', common:'Rock Pigeon', hindi:'कबूतर (Kabootar)', scientific:'Columba livia', emoji:'🐦', habitat:'Urban',
+    fact:"India's most familiar city bird. Descended from wild Rock Doves once used to carry messages across kingdoms.",
+    sound:'assets/pigeon.mp3',
+    bg:'linear-gradient(160deg,#0a1420 0%,#1a2e40 40%,#0f1c2a 100%)', bgGlow:'rgba(90,130,170,0.3)', particleColor:'#78909C',
+    cardBg:'linear-gradient(135deg,#1a2e40,#0a1420)' },
+
+  { id:'crow', common:'House Crow', hindi:'कौआ (Kawa)', scientific:'Corvus splendens', emoji:'🐦‍⬛', habitat:'Urban & Rural',
+    fact:"Revered in Hindu tradition as messengers to ancestors during Shraddha rituals. Remarkably intelligent and social.",
+    sound:'assets/crow.mp3',
+    bg:'linear-gradient(160deg,#050505 0%,#12121a 40%,#08080c 100%)', bgGlow:'rgba(60,60,90,0.3)', particleColor:'#546E7A',
+    cardBg:'linear-gradient(135deg,#12121a,#050505)' }
+];
+
+let currentAudio = null;
+let currentBirdId = null;
+
+// --- Layered sounds (independent of bird playback, and independent of each other) ---
+// Two groups share the exact same toggle/fade/loop behavior — add more sounds to
+// either group any time, the panel and logic are fully generic.
+const SOUND_GROUPS = [
+  {
+    key: 'ambience', containerId: 'ambienceButtons',
+    sounds: [
+      { id:'rain',  label:'Rain',  icon:'🌧️', file:'assets/rain.mp3',  volume:0.35 },
+      { id:'wind',  label:'Wind',  icon:'💨', file:'assets/wind.mp3',  volume:0.30 },
+      { id:'water', label:'Water', icon:'🌊', file:'assets/water.mp3', volume:0.30 },
+      { id:'bugs',  label:'Bugs',  icon:'🦗', file:'assets/bugs.mp3',  volume:0.25 }
+    ]
+  },
+  {
+    key: 'instruments', containerId: 'instrumentButtons',
+    sounds: [
+      { id:'flute',  label:'Flute',  icon:'🪈', file:'assets/flute.mp3',  volume:0.30 },
+      { id:'guitar', label:'Guitar', icon:'🎸', file:'assets/guitar.mp3', volume:0.30 },
+      { id:'piano',  label:'Piano',  icon:'🎹', file:'assets/piano.mp3',  volume:0.30 },
+      { id:'sitar',  label:'Sitar',  icon:'🎶', file:'assets/sitar.mp3',  volume:0.30 }
+    ]
   }
-  currentBirdId = null;
+];
+const ALL_SOUNDS = SOUND_GROUPS.flatMap(g => g.sounds); // flat lookup list, ids are unique across groups
+
+let ambientAudios = {}; // id -> Audio instance (created lazily on first toggle)
+let ambientOn = {};     // id -> boolean
+
+function renderAmbience() {
+  SOUND_GROUPS.forEach(group => {
+    document.getElementById(group.containerId).innerHTML = group.sounds.map(a => `
+      <button type="button" class="ambience-btn" id="amb-btn-${a.id}" onclick="toggleAmbient('${a.id}')" aria-label="Toggle ${a.label}" aria-pressed="false">
+        <span class="amb-icon">${a.icon}</span><span>${a.label}</span>
+      </button>`).join('');
+  });
+}
+
+function toggleAmbient(id) {
+  const conf = ALL_SOUNDS.find(a => a.id === id);
+  if (!conf) return;
+  const btn = document.getElementById('amb-btn-' + id);
+  const isOn = !!ambientOn[id];
+
+  if (!isOn) {
+    if (!ambientAudios[id]) {
+      const audio = new Audio(conf.file);
+      audio.loop = true;
+      audio.volume = 0;
+      audio.addEventListener('error', () => {
+        showToast("Sorry, " + conf.label + " sound couldn't be loaded. Make sure " + conf.file + " exists.");
+        audio.pause();
+        delete ambientAudios[id];
+        ambientOn[id] = false;
+        btn.classList.remove('active');
+        btn.setAttribute('aria-pressed', 'false');
+      });
+      ambientAudios[id] = audio;
+    }
+    const audio = ambientAudios[id];
+    audio.play().catch(() => {
+      // Autoplay was blocked — shouldn't normally happen since this runs from a click.
+    });
+    fadeAudio(audio, audio.volume, conf.volume, 800);
+    ambientOn[id] = true;
+    btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
+  } else {
+    const audio = ambientAudios[id];
+    fadeAudio(audio, audio.volume, 0, 600, () => audio.pause());
+    ambientOn[id] = false;
+    btn.classList.remove('active');
+    btn.setAttribute('aria-pressed', 'false');
+  }
+}
+
+function fadeAudio(audio, from, to, duration, onDone) {
+  if (audio._fadeInterval) clearInterval(audio._fadeInterval);
+  const steps = 20;
+  const stepTime = duration / steps;
+  let i = 0;
+  audio._fadeInterval = setInterval(() => {
+    i++;
+    audio.volume = Math.max(0, Math.min(1, from + (to - from) * (i / steps)));
+    if (i >= steps) {
+      clearInterval(audio._fadeInterval);
+      audio._fadeInterval = null;
+      if (onDone) onDone();
+    }
+  }, stepTime);
+}
+
+function renderGrid(list) {
+  const birds = list || BIRDS;
+  const grid = document.getElementById('birdsGrid');
+  const noResults = document.getElementById('noResults');
+
+  if (birds.length === 0) {
+    grid.innerHTML = '';
+    grid.style.display = 'none';
+    noResults.style.display = 'block';
+    return;
+  }
+  grid.style.display = 'grid';
+  noResults.style.display = 'none';
+
+  grid.innerHTML = birds.map(b => `
+    <div class="bird-card" id="card-${b.id}" onclick="playBird('${b.id}')"
+         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();playBird('${b.id}');}"
+         tabindex="0" role="button" aria-label="Play ${b.common} call"
+         style="--card-bg:${b.cardBg}">
+      <div class="habitat-tag">${b.habitat}</div>
+      <div class="bird-photo-wrap">
+        <div class="bird-emoji-fallback">${b.emoji}</div>
+      </div>
+      <div class="bird-info">
+        <div class="bird-common">${b.common}</div>
+        <div class="bird-hindi">${b.hindi}</div>
+        <div class="bird-scientific">${b.scientific}</div>
+        <div class="play-indicator">
+          <div class="play-dot"></div>
+          <div class="play-text" id="playtxt-${b.id}">Tap to play</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function filterBirds(query) {
+  const q = query.trim().toLowerCase();
+  const countEl = document.getElementById('searchCount');
+  if (!q) {
+    countEl.textContent = '';
+    renderGrid(BIRDS);
+    return;
+  }
+  const filtered = BIRDS.filter(b =>
+    b.common.toLowerCase().includes(q) ||
+    b.hindi.toLowerCase().includes(q) ||
+    b.scientific.toLowerCase().includes(q) ||
+    b.habitat.toLowerCase().includes(q)
+  );
+  countEl.textContent = filtered.length + (filtered.length === 1 ? ' bird' : ' birds');
+  renderGrid(filtered);
+}
+
+function playBird(id) {
+  const bird = BIRDS.find(b => b.id === id);
+  if (!bird) return;
+  if (currentBirdId === id) { stopAll(); return; }
+
+  if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
   document.querySelectorAll('.bird-card').forEach(c => c.classList.remove('playing','loading-sound'));
   document.querySelectorAll('[id^="playtxt-"]').forEach(t => t.textContent = 'Tap to play');
 
-  try {
-    mediaStream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true,
-        channelCount: 1
-      }
-    });
-  } catch (err) {
-    console.error(err);
-    alert('Microphone access is needed for Tota to hear you. Please allow mic permission and try again.');
-    return;
-  }
+  currentBirdId = id;
+  const card = document.getElementById('card-'+id);
+  card.classList.add('loading-sound');
+  document.getElementById('playtxt-'+id).textContent = 'Loading...';
 
-  recordedChunks = [];
-  const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-    ? 'audio/webm;codecs=opus'
-    : (MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4');
+  showFeatured(bird);
+  updateBackground(bird);
+  spawnRipple(card);
+  document.querySelectorAll('.bird-silhouette').forEach(s => s.classList.add('active'));
 
-  try {
-    mediaRecorder = new MediaRecorder(mediaStream, { mimeType: mime });
-  } catch (err) {
-    mediaRecorder = new MediaRecorder(mediaStream);
-  }
-
-  mediaRecorder.ondataavailable = (ev) => {
-    if (ev.data && ev.data.size > 0) recordedChunks.push(ev.data);
-  };
-
-  mediaRecorder.onstop = async () => {
-    // Stop tracks immediately to release the mic indicator
-    if (mediaStream) {
-      mediaStream.getTracks().forEach(t => t.stop());
-      mediaStream = null;
-    }
-
-    if (!recordedChunks.length) {
-      resetTotaUI();
-      return;
-    }
-
-    const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
-    recordedChunks = [];
-    await playAsTota(blob);
-  };
-
-  mediaRecorder.start(100); // collect data frequently
-  isRecordingTota = true;
-
-  const btn = document.getElementById('totaTalkBtn');
-  btn.classList.add('recording');
-  btn.classList.remove('playing-back');
-  document.getElementById('totaTalkIcon').textContent = '🔴';
-  document.getElementById('totaTalkLabel').textContent = 'Listening… release to hear Tota';
-  document.getElementById('totaHint').textContent = 'Speak clearly — Tota is listening';
-
-  // Visual feedback: highlight parakeet card + featured
-  showFeatured(TOTA_BIRD);
-  updateBackground(TOTA_BIRD);
-  const card = document.getElementById('card-parakeet');
-  if (card) {
-    card.classList.add('loading-sound');
-    document.getElementById('playtxt-parakeet').textContent = 'Listening…';
-  }
-}
-
-function stopTotaTalk(e) {
-  if (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.pointerId != null && e.target && e.target.releasePointerCapture) {
-      try { e.target.releasePointerCapture(e.pointerId); } catch (_) {}
-    }
-  }
-  if (!isRecordingTota || !mediaRecorder) return;
-
-  isRecordingTota = false;
-  if (mediaRecorder.state === 'recording') {
-    mediaRecorder.stop();
-  } else {
-    // Safety: if already stopped, still release stream
-    if (mediaStream) {
-      mediaStream.getTracks().forEach(t => t.stop());
-      mediaStream = null;
-    }
-    resetTotaUI();
-  }
-}
-
-async function playAsTota(blob) {
-  const btn = document.getElementById('totaTalkBtn');
-  btn.classList.remove('recording');
-  btn.classList.add('playing-back');
-  document.getElementById('totaTalkIcon').textContent = '🦜';
-  document.getElementById('totaTalkLabel').textContent = 'Tota is speaking…';
-  document.getElementById('totaHint').textContent = 'Mimicking you like a real Indian parrot';
-
-  const card = document.getElementById('card-parakeet');
-  if (card) {
+  const audio = new Audio(bird.sound);
+  audio.addEventListener('canplaythrough', () => {
+    currentAudio = audio;
     card.classList.remove('loading-sound');
     card.classList.add('playing');
-    document.getElementById('playtxt-parakeet').textContent = 'Mimicking…';
-  }
+    document.getElementById('playtxt-'+id).textContent = 'Now playing...';
+    document.getElementById('npName').textContent = bird.common;
+    document.getElementById('npSub').textContent = bird.hindi + ' · ' + bird.habitat;
+    document.getElementById('nowPlaying').classList.add('visible');
+    audio.play();
+  }, { once: true });
 
-  document.getElementById('npName').textContent = 'Tota (Mimic)';
-  document.getElementById('npSub').textContent = 'तोता · repeating you';
-  document.getElementById('nowPlaying').classList.add('visible');
+  audio.addEventListener('ended', () => stopAll());
+  audio.addEventListener('error', () => {
+    card.classList.remove('loading-sound');
+    showToast("Sorry, sound failed to load for " + bird.common);
+  });
+}
 
-  try {
-    const arrayBuffer = await blob.arrayBuffer();
-    const ctx = getAudioContext();
-    const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+function stopAll() {
+  // Note: this intentionally does NOT touch ambientAudios — ambience sounds keep playing.
+  if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; }
+  currentBirdId = null;
+  document.querySelectorAll('.bird-card').forEach(c => c.classList.remove('playing','loading-sound'));
+  document.querySelectorAll('[id^="playtxt-"]').forEach(t => t.textContent = 'Tap to play');
+  document.getElementById('nowPlaying').classList.remove('visible');
+  document.getElementById('featuredPanel').classList.remove('visible');
+  document.querySelectorAll('.bird-silhouette').forEach(s => s.classList.remove('active'));
+  document.getElementById('bgActive').style.opacity = '0';
+}
 
-    // Clean any previous mimic source
-    if (currentMimicSource) {
-      try { currentMimicSource.stop(); } catch (_) {}
-      currentMimicSource = null;
-    }
+function updateBackground(bird) {
+  const bg = document.getElementById('bgActive');
+  bg.style.background = `${bird.bg},radial-gradient(ellipse at 30% 40%, ${bird.bgGlow} 0%,transparent 55%)`;
+  bg.style.opacity = '1';
+  spawnParticles(bird.particleColor);
+}
 
-    const source = ctx.createBufferSource();
-    source.buffer = audioBuffer;
-
-    // Pitch / speed: ~1.55× makes it lively and parrot-like without extreme chipmunk
-    // Real Rose-ringed Parakeets have higher-pitched, sharper voices.
-    source.playbackRate.value = 1.55;
-
-    // Gentle high-shelf boost + mild bandpass to reduce muddy low-end
-    // and give a clearer, bird-like timbre (not robotic).
-    const highShelf = ctx.createBiquadFilter();
-    highShelf.type = 'highshelf';
-    highShelf.frequency.value = 1800;
-    highShelf.gain.value = 6;
-
-    const band = ctx.createBiquadFilter();
-    band.type = 'peaking';
-    band.frequency.value = 2800;
-    band.Q.value = 1.1;
-    band.gain.value = 4;
-
-    const lowCut = ctx.createBiquadFilter();
-    lowCut.type = 'highpass';
-    lowCut.frequency.value = 180;
-    lowCut.Q.value = 0.7;
-
-    const gainNode = ctx.createGain();
-    gainNode.gain.value = 1.15; // slight boost after filtering
-
-    source.connect(lowCut);
-    lowCut.connect(band);
-    band.connect(highShelf);
-    highShelf.connect(gainNode);
-    gainNode.connect(ctx.destination);
-
-    currentMimicSource = source;
-
-    source.onended = () => {
-      currentMimicSource = null;
-      resetTotaUI();
-      // Keep the featured panel visible a moment longer, then allow stopAll to clean if needed
-      setTimeout(() => {
-        if (!currentAudio && !currentMimicSource) {
-          document.getElementById('nowPlaying').classList.remove('visible');
-          if (card) {
-            card.classList.remove('playing');
-            document.getElementById('playtxt-parakeet').textContent = 'Tap to play';
-          }
-        }
-      }, 400);
-    };
-
-    source.start(0);
-  } catch (err) {
-    console.error('Tota playback error:', err);
-    alert('Could not process the recording. Please try speaking a bit louder or check your microphone.');
-    resetTotaUI();
+function spawnParticles(color) {
+  const c = document.getElementById('particles');
+  c.innerHTML = '';
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const s = Math.random()*4+2;
+    p.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;background:${color};--drift:${(Math.random()-0.5)*200}px;animation-duration:${Math.random()*8+6}s;animation-delay:${Math.random()*4}s;`;
+    c.appendChild(p);
   }
 }
 
-function resetTotaUI() {
-  isRecordingTota = false;
-  const btn = document.getElementById('totaTalkBtn');
-  if (btn) {
-    btn.classList.remove('recording', 'playing-back');
-    document.getElementById('totaTalkIcon').textContent = '🦜';
-    document.getElementById('totaTalkLabel').textContent = 'Hold & Speak';
-    document.getElementById('totaHint').textContent = 'Hold the button, speak, then release — Tota will mimic you like a real Indian parrot';
-  }
-  const card = document.getElementById('card-parakeet');
-  if (card && !currentAudio) {
-    card.classList.remove('playing', 'loading-sound');
-    const txt = document.getElementById('playtxt-parakeet');
-    if (txt) txt.textContent = 'Tap to play';
+function spawnRipple(card) {
+  const c = document.getElementById('rippleContainer');
+  const r = card.getBoundingClientRect();
+  for (let i = 0; i < 3; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'ripple';
+      el.style.left = (r.left + r.width/2) + 'px';
+      el.style.top = (r.top + r.height/2) + 'px';
+      el.style.animationDelay = (i*0.4)+'s';
+      c.appendChild(el);
+      setTimeout(() => el.remove(), 3500);
+    }, i*300);
   }
 }
 
-// Make sure stopAll also stops any ongoing mimic
-const originalStopAll = stopAll;
-stopAll = function() {
-  if (currentMimicSource) {
-    try { currentMimicSource.stop(); } catch (_) {}
-    currentMimicSource = null;
-  }
-  if (isRecordingTota && mediaRecorder && mediaRecorder.state === 'recording') {
-    mediaRecorder.stop();
-  }
-  if (mediaStream) {
-    mediaStream.getTracks().forEach(t => t.stop());
-    mediaStream = null;
-  }
-  isRecordingTota = false;
-  resetTotaUI();
-  originalStopAll();
-};
+function showFeatured(bird) {
+  const panel = document.getElementById('featuredPanel');
+  panel.classList.remove('visible');
+  setTimeout(() => {
+    const fallback = document.getElementById('featuredEmojiFallback');
+    fallback.textContent = bird.emoji;
 
-renderGrid();  
-renderAmbience();  
-</script>  
-</body>  
-                                                             </html>
+    document.getElementById('featuredName').textContent = bird.common;
+    document.getElementById('featuredHindi').textContent = bird.hindi;
+    document.getElementById('featuredHabitat').textContent = bird.habitat;
+    document.getElementById('featuredFact').textContent = bird.fact;
+    document.getElementById('featuredScientific').textContent = bird.scientific;
+    panel.classList.add('visible');
+  }, 80);
+}
+
+renderGrid();
+renderAmbience();
+</script>
+</body>
+</html>
