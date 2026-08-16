@@ -14,6 +14,7 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;transition:background var(--transition);}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0;}
 body::before{content:'';position:fixed;inset:-50%;background:repeating-conic-gradient(from 0deg at 50% 50%,transparent 0deg,transparent 5deg,rgba(126,184,154,0.008) 5deg,rgba(126,184,154,0.008) 5.5deg);animation:bgSpin 200s linear infinite;pointer-events:none;z-index:0;}
 @keyframes bgSpin{to{transform:rotate(360deg);}}
 .bg-layer{position:fixed;inset:0;z-index:0;transition:opacity var(--transition);pointer-events:none;}
@@ -206,8 +207,9 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 
   <div class="grid-label">◆ Tap a bird to hear its call</div>
   <div class="search-row">
+    <label for="birdSearch" class="sr-only">Search birds by name, Hindi name, or habitat</label>
     <input type="text" id="birdSearch" class="bird-search" placeholder="Search by name, Hindi name, or habitat…" autocomplete="off" oninput="filterBirds(this.value)"/>
-    <div class="search-count" id="searchCount"></div>
+    <div class="search-count" id="searchCount" aria-live="polite"></div>
   </div>
   <div class="birds-grid" id="birdsGrid"></div>
   <div class="no-results" id="noResults" style="display:none">No birds match your search.</div>
@@ -215,7 +217,7 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
   <footer><div class="footer-text">"In every walk with nature, one receives far more than he seeks." — John Muir</div></footer>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <div class="now-playing" id="nowPlaying">
   <div class="np-wave"><div class="np-bar"></div><div class="np-bar"></div><div class="np-bar"></div><div class="np-bar"></div><div class="np-bar"></div></div>
@@ -535,8 +537,13 @@ function playBird(id) {
 
   audio.addEventListener('ended', () => stopAll());
   audio.addEventListener('error', () => {
-    card.classList.remove('loading-sound');
-    showToast("Sorry, sound failed to load for " + bird.common);
+    // Only reset state if this audio still corresponds to the current bird
+    if (currentBirdId === id) {
+      card.classList.remove('loading-sound');
+      document.getElementById('playtxt-'+id).textContent = 'Tap to play';
+      currentBirdId = null;
+      showToast("Sorry, sound failed to load for " + bird.common);
+    }
   });
 }
 
