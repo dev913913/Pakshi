@@ -597,6 +597,7 @@ function playSoundForBird(bird, soundList, index) {
     document.getElementById('npName').textContent = bird.common;
     document.getElementById('npSub').textContent = bird.hindi + ' · ' + bird.habitat + (entry.label ? ' · ' + entry.label : '');
     document.getElementById('nowPlaying').classList.add('visible');
+    audio.loop = loopOn;
     audio.play();
   }, { once: true });
 
