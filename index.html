@@ -19,12 +19,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
 :root {
-  --bg: #0d1117; --text: #e8e0d4; --muted: rgba(232,224,212,0.45);
+  --bg: #0d1117; --text: #e8e0d4; --muted: rgba(232,224,212,0.65);
   --card: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08);
   --accent: #7eb89a; --transition: 1.2s cubic-bezier(0.4,0,0.2,1);
 }
 :root[data-theme="light"] {
-  --bg: #faf6ec; --text: #2b2620; --muted: rgba(43,38,32,0.55);
+  --bg: #faf6ec; --text: #2b2620; --muted: rgba(43,38,32,0.68);
   --card: rgba(0,0,0,0.035); --border: rgba(0,0,0,0.10);
   --accent: #4f9c76;
 }
@@ -119,9 +119,9 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .featured-emoji-fallback{font-size:66px;line-height:1;text-align:center;}
 .featured-bird-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--accent);margin-top:12px;text-align:center;line-height:1.4;max-width:100%;}
 .featured-bird-hindi{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;color:var(--muted);margin-top:3px;text-align:center;max-width:100%;line-height:1.4;}
-.featured-habitat{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(126,184,154,0.4);margin-top:7px;}
+.featured-habitat{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(126,184,154,0.75);margin-top:7px;}
 .featured-right{flex:1;padding:28px 28px 24px;display:flex;flex-direction:column;justify-content:center;gap:10px;}
-.featured-label{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(126,184,154,0.4);}
+.featured-label{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(126,184,154,0.75);}
 .featured-fact{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2vw,19px);line-height:1.7;color:rgba(232,224,212,0.8);font-style:italic;}
 .featured-scientific{font-size:11px;color:rgba(232,224,212,0.55);letter-spacing:1px;font-style:italic;}
 .grid-label{font-size:11px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;margin-bottom:20px;animation:fadeUp 0.8s 0.1s ease both;}
@@ -178,7 +178,7 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .toast.visible{opacity:1;transform:translateX(-50%) translateY(0);}
 @media(max-width:600px){.toast{top:auto;bottom:90px;font-size:12px;padding:10px 16px;}}
 footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid var(--border);animation:fadeUp 0.8s 0.4s ease both;}
-.footer-text{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:rgba(232,224,212,0.6);letter-spacing:1px;}
+.footer-text{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:rgba(232,224,212,0.7);letter-spacing:1px;}
 .footer-credit{margin-top:16px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
 .footer-credit a{color:var(--accent);text-decoration:none;font-weight:500;border-bottom:1px solid rgba(126,184,154,0.35);padding-bottom:1px;transition:border-color 0.2s,color 0.2s;}
 .footer-credit a:hover{border-color:var(--accent);color:var(--text);}
@@ -191,8 +191,8 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 :root[data-theme="light"] .toast{background:rgba(255,252,244,0.97);border-color:rgba(200,70,70,0.3);}
 :root[data-theme="light"] .featured-left{background:rgba(0,0,0,0.035);}
 :root[data-theme="light"] .featured-fact{color:rgba(43,38,32,0.85);}
-:root[data-theme="light"] .featured-scientific{color:rgba(43,38,32,0.6);}
-:root[data-theme="light"] .footer-text{color:rgba(43,38,32,0.65);}
+:root[data-theme="light"] .featured-scientific{color:rgba(43,38,32,0.68);}
+:root[data-theme="light"] .footer-text{color:rgba(43,38,32,0.72);}
 :root[data-theme="light"] .bird-silhouette path{stroke:rgba(60,50,40,0.5);}
 :root[data-theme="light"] .ripple{border-color:rgba(60,50,40,0.15);}
 .bird-common{color:#f5f0e8;} /* card text always sits on a dark per-bird photo tile — kept fixed regardless of site theme */
