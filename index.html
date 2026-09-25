@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Pakshi — Indian Bird Sound Library</title>
-  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
 :root {
@@ -98,6 +98,7 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
   filter:drop-shadow(0 0 24px rgba(126,184,154,0.5));animation:birdFloat 3s ease-in-out infinite;}
 @keyframes birdFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
 .featured-photo{width:84px;height:84px;border-radius:50%;object-fit:cover;border:2px solid rgba(126,184,154,0.4);}
+.featured-icon-img{width:84px;height:84px;object-fit:contain;filter:drop-shadow(0 4px 20px rgba(0,0,0,0.4));}
 .featured-emoji-fallback{font-size:66px;line-height:1;text-align:center;}
 .featured-bird-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--accent);margin-top:12px;text-align:center;line-height:1.4;max-width:100%;}
 .featured-bird-hindi{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;color:var(--muted);margin-top:3px;text-align:center;max-width:100%;line-height:1.4;}
@@ -131,6 +132,8 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .bird-photo{width:96px;height:96px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.18);
   box-shadow:0 4px 20px rgba(0,0,0,0.5);}
 .bird-card.playing .bird-photo{border-color:var(--accent);box-shadow:0 0 20px rgba(126,184,154,0.4);}
+.bird-icon-img{width:96px;height:96px;object-fit:contain;filter:drop-shadow(0 4px 20px rgba(0,0,0,0.5));}
+.bird-card.playing .bird-icon-img{filter:drop-shadow(0 0 20px rgba(126,184,154,0.55));}
 .bird-emoji-fallback{font-size:60px;filter:drop-shadow(0 4px 20px rgba(0,0,0,0.5));line-height:1;}
 .habitat-tag{position:absolute;top:12px;right:12px;z-index:2;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.5);background:rgba(0,0,0,0.3);padding:4px 8px;border:1px solid rgba(255,255,255,0.1);}
 .multi-sound-tag{position:absolute;top:12px;left:12px;z-index:2;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);background:rgba(126,184,154,0.15);padding:4px 8px;border:1px solid rgba(126,184,154,0.3);border-radius:10px;}
@@ -158,11 +161,11 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 @media(max-width:600px){
   header{padding-top:200px;}
-  .birds-grid{grid-template-columns:repeat(2,1fr);}.bird-photo{width:64px;height:64px;}.bird-emoji-fallback{font-size:42px;}.bird-common{font-size:16px;}
+  .birds-grid{grid-template-columns:repeat(2,1fr);}.bird-photo{width:64px;height:64px;}.bird-icon-img{width:64px;height:64px;}.bird-emoji-fallback{font-size:42px;}.bird-common{font-size:16px;}
   .now-playing{padding:12px 16px;}.np-name{font-size:15px;}
   .featured-inner{flex-direction:column;}
   .featured-left{width:100%;flex-direction:row;gap:16px;padding:16px 18px;border-right:none;border-bottom:1px solid var(--border);}
-  .featured-photo{width:56px;height:56px;}.featured-photo-wrap{animation:none;}.featured-bird-name{font-size:16px;text-align:left;margin-top:0;}
+  .featured-photo{width:56px;height:56px;}.featured-icon-img{width:56px;height:56px;}.featured-photo-wrap{animation:none;}.featured-bird-name{font-size:16px;text-align:left;margin-top:0;}
   .featured-bird-hindi{text-align:left;}.featured-right{padding:16px 18px;}.featured-fact{font-size:14px;}
 }
 @media(max-width:380px){.birds-grid{grid-template-columns:1fr;}}
@@ -200,7 +203,9 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
     <div class="featured-inner">
       <div class="featured-left">
         <div class="featured-photo-wrap">
-          <div class="featured-emoji-fallback" id="featuredEmojiFallback">🐦</div>
+          <img class="featured-icon-img" id="featuredIconImg" src="" alt=""
+               onerror="this.style.display='none'; document.getElementById('featuredEmojiFallback').style.display='';" />
+          <div class="featured-emoji-fallback" id="featuredEmojiFallback" style="display:none">🐦</div>
         </div>
         <div class="featured-bird-name" id="featuredName">—</div>
         <div class="featured-bird-hindi" id="featuredHindi">—</div>
@@ -504,7 +509,9 @@ function renderGrid(list) {
       <div class="habitat-tag">${b.habitat}</div>
       ${b.sounds ? `<div class="multi-sound-tag">${b.sounds.length} sounds</div>` : ''}
       <div class="bird-photo-wrap">
-        <div class="bird-emoji-fallback">${b.emoji}</div>
+        <img class="bird-icon-img" src="assets/icons/${b.id}.png" alt="" loading="lazy"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='';" />
+        <div class="bird-emoji-fallback" style="display:none">${b.emoji}</div>
       </div>
       <div class="bird-info">
         <div class="bird-common">${b.common}</div>
@@ -669,6 +676,11 @@ function showFeatured(bird) {
   setTimeout(() => {
     const fallback = document.getElementById('featuredEmojiFallback');
     fallback.textContent = bird.emoji;
+    fallback.style.display = 'none';
+
+    const iconImg = document.getElementById('featuredIconImg');
+    iconImg.style.display = '';
+    iconImg.src = 'assets/icons/' + bird.id + '.png';
 
     document.getElementById('featuredName').textContent = bird.common;
     document.getElementById('featuredHindi').textContent = bird.hindi;
