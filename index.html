@@ -82,6 +82,15 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .np-stop:hover{border-color:rgba(126,184,154,0.4);color:var(--accent);}
 .np-stop:active{transform:scale(0.95);}
 .np-stop:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.np-loop{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:8px 14px;cursor:pointer;transition:all 0.2s;flex-shrink:0;display:flex;align-items:center;gap:6px;}
+.np-loop:hover{border-color:rgba(126,184,154,0.4);color:var(--text);}
+.np-loop:active{transform:scale(0.95);}
+.np-loop:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.np-loop.active{border-color:var(--accent);color:var(--accent);background:rgba(126,184,154,0.12);box-shadow:0 0 16px rgba(126,184,154,0.15);}
+.np-loop .loop-icon{font-size:14px;line-height:1;transition:transform 0.4s ease;}
+.np-loop.active .loop-icon{animation:loopSpin 2.2s linear infinite;}
+@keyframes loopSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+@media(max-width:600px){.np-loop span:last-child{display:none;}.np-loop{padding:8px 10px;}}
 .featured-panel{display:none;margin-bottom:3px;overflow:hidden;}
 .featured-panel.visible{display:flex;animation:featuredIn 0.45s cubic-bezier(0.4,0,0.2,1) both;}
 @keyframes featuredIn{from{opacity:0;transform:translateY(-12px);}to{opacity:1;transform:translateY(0);}}
@@ -224,6 +233,9 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 <div class="now-playing" id="nowPlaying">
   <div class="np-wave"><div class="np-bar"></div><div class="np-bar"></div><div class="np-bar"></div><div class="np-bar"></div><div class="np-bar"></div></div>
   <div class="np-info"><div class="np-name" id="npName">—</div><div class="np-sub" id="npSub">Now playing</div></div>
+  <button type="button" class="np-loop" id="npLoopBtn" onclick="toggleLoop()" aria-pressed="false" aria-label="Loop this sound">
+    <span class="loop-icon">⟳</span><span>Loop</span>
+  </button>
   <button type="button" class="np-stop" onclick="stopAll()">■ Stop</button>
 </div>
 
@@ -522,6 +534,15 @@ function filterBirds(query) {
 }
 
 let currentSoundIndex = 0;
+let loopOn = false;
+
+function toggleLoop() {
+  loopOn = !loopOn;
+  const btn = document.getElementById('npLoopBtn');
+  btn.classList.toggle('active', loopOn);
+  btn.setAttribute('aria-pressed', loopOn ? 'true' : 'false');
+  if (currentAudio) currentAudio.loop = loopOn;
+}
 
 function getSoundList(bird) {
   return bird.sounds || [{ label: null, file: bird.sound }];
@@ -565,6 +586,7 @@ function playSoundForBird(bird, soundList, index) {
   document.querySelectorAll('.bird-silhouette').forEach(s => s.classList.add('active'));
 
   const audio = new Audio(entry.file);
+  audio.loop = loopOn;
   audio.addEventListener('canplaythrough', () => {
     currentAudio = audio;
     card.classList.remove('loading-sound');
