@@ -23,6 +23,11 @@
   --card: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08);
   --accent: #7eb89a; --transition: 1.2s cubic-bezier(0.4,0,0.2,1);
 }
+:root[data-theme="light"] {
+  --bg: #faf6ec; --text: #2b2620; --muted: rgba(43,38,32,0.55);
+  --card: rgba(0,0,0,0.035); --border: rgba(0,0,0,0.10);
+  --accent: #4f9c76;
+}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;transition:background var(--transition);}
@@ -30,7 +35,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 body::before{content:'';position:fixed;inset:-50%;background:repeating-conic-gradient(from 0deg at 50% 50%,transparent 0deg,transparent 5deg,rgba(126,184,154,0.008) 5deg,rgba(126,184,154,0.008) 5.5deg);animation:bgSpin 200s linear infinite;pointer-events:none;z-index:0;}
 @keyframes bgSpin{to{transform:rotate(360deg);}}
 .bg-layer{position:fixed;inset:0;z-index:0;transition:opacity var(--transition);pointer-events:none;}
-.bg-default{background:radial-gradient(ellipse at 20% 50%,rgba(30,60,30,0.4) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(20,40,60,0.3) 0%,transparent 50%),linear-gradient(160deg,#0d1117 0%,#0a1a0e 50%,#0d1117 100%);opacity:1;}
+.bg-default{background:radial-gradient(ellipse at 20% 50%,rgba(30,60,30,0.4) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(20,40,60,0.3) 0%,transparent 50%),linear-gradient(160deg,#0d1117 0%,#0a1a0e 50%,#0d1117 100%);opacity:1;transition:background var(--transition);}
+:root[data-theme="light"] .bg-default{background:radial-gradient(ellipse at 20% 50%,rgba(180,220,190,0.5) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(190,215,235,0.4) 0%,transparent 50%),linear-gradient(160deg,#faf6ec 0%,#f2ede0 50%,#faf6ec 100%);}
 .bg-active{opacity:0;}.bg-active.visible{opacity:1;}
 .particles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
 .particle{position:absolute;border-radius:50%;animation:drift linear infinite;opacity:0;}
@@ -177,6 +183,28 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 .footer-credit a{color:var(--accent);text-decoration:none;font-weight:500;border-bottom:1px solid rgba(126,184,154,0.35);padding-bottom:1px;transition:border-color 0.2s,color 0.2s;}
 .footer-credit a:hover{border-color:var(--accent);color:var(--text);}
 .footer-credit a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
+
+/* --- Day mode overrides for elements with hardcoded (non-variable) dark colors --- */
+:root[data-theme="light"] .ambience-panel{background:rgba(255,252,244,0.85);box-shadow:0 8px 30px rgba(0,0,0,0.1);}
+:root[data-theme="light"] .ambience-btn{background:rgba(0,0,0,0.03);}
+:root[data-theme="light"] .now-playing{background:rgba(255,252,244,0.94);}
+:root[data-theme="light"] .toast{background:rgba(255,252,244,0.97);border-color:rgba(200,70,70,0.3);}
+:root[data-theme="light"] .featured-left{background:rgba(0,0,0,0.035);}
+:root[data-theme="light"] .featured-fact{color:rgba(43,38,32,0.85);}
+:root[data-theme="light"] .featured-scientific{color:rgba(43,38,32,0.6);}
+:root[data-theme="light"] .footer-text{color:rgba(43,38,32,0.65);}
+:root[data-theme="light"] .bird-silhouette path{stroke:rgba(60,50,40,0.5);}
+:root[data-theme="light"] .ripple{border-color:rgba(60,50,40,0.15);}
+.bird-common{color:#f5f0e8;} /* card text always sits on a dark per-bird photo tile — kept fixed regardless of site theme */
+
+.theme-toggle{flex-shrink:0;width:42px;height:42px;display:flex;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all 0.2s;border-radius:2px;}
+.theme-toggle:hover{border-color:rgba(126,184,154,0.4);color:var(--accent);background:rgba(255,255,255,0.06);}
+.theme-toggle:active{transform:scale(0.92);}
+.theme-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.theme-toggle svg{display:none;}
+.theme-toggle .icon-sun{display:block;}
+:root[data-theme="light"] .theme-toggle .icon-sun{display:none;}
+:root[data-theme="light"] .theme-toggle .icon-moon{display:block;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 @media(max-width:600px){
   header{padding-top:200px;}
@@ -243,6 +271,18 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
     <label for="birdSearch" class="sr-only">Search birds by name, Hindi name, or habitat</label>
     <input type="text" id="birdSearch" class="bird-search" placeholder="Search birds by name, Hindi name, or habitat…" autocomplete="off" oninput="filterBirds(this.value)"/>
     <div class="search-count" id="searchCount" aria-live="polite"></div>
+    <button type="button" class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Switch to light mode" aria-pressed="false">
+      <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"/>
+        <line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
     <button type="button" class="share-btn" onclick="shareSite()" aria-label="Share Pakshi with someone">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
@@ -290,10 +330,35 @@ function showToast(message) {
   toastTimer = setTimeout(() => toast.classList.remove('visible'), 3500);
 }
 
+function applyTheme(theme) {
+  const root = document.documentElement;
+  if (theme === 'light') root.setAttribute('data-theme', 'light');
+  else root.removeAttribute('data-theme');
+  const btn = document.getElementById('themeToggle');
+  if (btn) {
+    btn.setAttribute('aria-pressed', theme === 'light' ? 'true' : 'false');
+    btn.setAttribute('aria-label', theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
+  }
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+  const next = current === 'light' ? 'dark' : 'light';
+  applyTheme(next);
+  try { localStorage.setItem('pakshi-theme', next); } catch (e) { /* storage unavailable — theme just won't persist */ }
+}
+
+function initTheme() {
+  let saved = null;
+  try { saved = localStorage.getItem('pakshi-theme'); } catch (e) { /* storage unavailable */ }
+  applyTheme(saved === 'light' ? 'light' : 'dark');
+}
+initTheme();
+
 function shareSite() {
   const shareData = {
     title: 'Pakshi — Indian Bird Sound Library',
-   text: "Explore India's birds 🦚 — tap any bird to hear its real call, learn its Hindi name, and discover fun facts. Made for curious kids and nature lovers.",
+    text: "Explore India's birds 🦚 — tap any bird to hear its real call, learn its Hindi name, and discover fun facts. Made for curious kids and nature lovers.",
     url: window.location.href
   };
   if (navigator.share) {
