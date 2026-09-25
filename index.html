@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Pakshi — Indian Bird Sound Library</title>
-  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
 :root {
@@ -106,7 +106,7 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .featured-right{flex:1;padding:28px 28px 24px;display:flex;flex-direction:column;justify-content:center;gap:10px;}
 .featured-label{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(126,184,154,0.4);}
 .featured-fact{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2vw,19px);line-height:1.7;color:rgba(232,224,212,0.8);font-style:italic;}
-.featured-scientific{font-size:11px;color:rgba(232,224,212,0.2);letter-spacing:1px;font-style:italic;}
+.featured-scientific{font-size:11px;color:rgba(232,224,212,0.55);letter-spacing:1px;font-style:italic;}
 .grid-label{font-size:11px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;margin-bottom:20px;animation:fadeUp 0.8s 0.1s ease both;}
 .search-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;animation:fadeUp 0.8s 0.15s ease both;}
 .bird-search{flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);
@@ -140,7 +140,7 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .bird-info{position:relative;z-index:2;padding:16px 20px 18px;background:linear-gradient(transparent,rgba(0,0,0,0.7) 40%,rgba(0,0,0,0.9));}
 .bird-common{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);line-height:1;}
 .bird-hindi{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:rgba(255,255,255,0.5);margin-top:2px;}
-.bird-scientific{font-size:10px;letter-spacing:1px;color:rgba(255,255,255,0.3);margin-top:4px;font-style:italic;}
+.bird-scientific{font-size:10px;letter-spacing:1px;color:rgba(255,255,255,0.5);margin-top:4px;font-style:italic;}
 .play-indicator{display:flex;align-items:center;gap:6px;margin-top:10px;opacity:0;transform:translateY(4px);transition:all 0.2s ease;}
 .bird-card:hover .play-indicator,.bird-card.playing .play-indicator,.bird-card.loading-sound .play-indicator{opacity:1;transform:translateY(0);}
 .play-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
@@ -157,7 +157,11 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .toast.visible{opacity:1;transform:translateX(-50%) translateY(0);}
 @media(max-width:600px){.toast{top:auto;bottom:90px;font-size:12px;padding:10px 16px;}}
 footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid var(--border);animation:fadeUp 0.8s 0.4s ease both;}
-.footer-text{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:rgba(232,224,212,0.2);letter-spacing:1px;}
+.footer-text{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:rgba(232,224,212,0.6);letter-spacing:1px;}
+.footer-credit{margin-top:16px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.footer-credit a{color:var(--accent);text-decoration:none;font-weight:500;border-bottom:1px solid rgba(126,184,154,0.35);padding-bottom:1px;transition:border-color 0.2s,color 0.2s;}
+.footer-credit a:hover{border-color:var(--accent);color:var(--text);}
+.footer-credit a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 @media(max-width:600px){
   header{padding-top:200px;}
@@ -228,7 +232,9 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
   <div class="birds-grid" id="birdsGrid"></div>
   <div class="no-results" id="noResults" style="display:none">No birds match your search.</div>
   
-  <footer><div class="footer-text">"In every walk with nature, one receives far more than he seeks." — John Muir</div></footer>
+  <footer><div class="footer-text">"In every walk with nature, one receives far more than he seeks." — John Muir</div>
+  <div class="footer-credit">Built by <a href="https://dev-portfolio-3000.vercel.app/" target="_blank" rel="noopener noreferrer">Dev Kumar</a></div>
+  </footer>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
