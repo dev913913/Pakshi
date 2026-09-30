@@ -31,6 +31,12 @@ body::before{content:'';position:fixed;inset:-50%;background:repeating-conic-gra
 @keyframes bgSpin{to{transform:rotate(360deg);}}
 .bg-layer{position:fixed;inset:0;z-index:0;transition:opacity var(--transition);pointer-events:none;}
 .bg-default{background:radial-gradient(ellipse at 20% 50%,rgba(30,60,30,0.4) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(20,40,60,0.3) 0%,transparent 50%),linear-gradient(160deg,#0d1117 0%,#0a1a0e 50%,#0d1117 100%);opacity:1;animation:bgBreathe 9s ease-in-out infinite;}
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  .bg-default,
+  .particles .particle,
+  .bird-silhouette { animation: none; }
+}
 @keyframes bgBreathe{0%,100%{filter:brightness(1);}50%{filter:brightness(1.12);}}
 .bg-active{opacity:0;}.bg-active.visible{opacity:1;}
 .particles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
