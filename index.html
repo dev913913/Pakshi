@@ -31,12 +31,6 @@ body::before{content:'';position:fixed;inset:-50%;background:repeating-conic-gra
 @keyframes bgSpin{to{transform:rotate(360deg);}}
 .bg-layer{position:fixed;inset:0;z-index:0;transition:opacity var(--transition);pointer-events:none;}
 .bg-default{background:radial-gradient(ellipse at 20% 50%,rgba(30,60,30,0.4) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(20,40,60,0.3) 0%,transparent 50%),linear-gradient(160deg,#0d1117 0%,#0a1a0e 50%,#0d1117 100%);opacity:1;animation:bgBreathe 9s ease-in-out infinite;}
-@media (prefers-reduced-motion: reduce) {
-  body::before,
-  .bg-default,
-  .particles .particle,
-  .bird-silhouette { animation: none; }
-}
 @keyframes bgBreathe{0%,100%{filter:brightness(1);}50%{filter:brightness(1.12);}}
 .bg-active{opacity:0;}.bg-active.visible{opacity:1;}
 .particles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
@@ -207,6 +201,17 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
   .featured-bird-hindi{text-align:left;}.featured-right{padding:16px 18px;}.featured-fact{font-size:14px;}
 }
 @media(max-width:380px){.birds-grid{grid-template-columns:1fr;}}
+
+/* Kept last on purpose: several rules above re-set animation-name for these same
+   selectors (driftFlutter for leaf/feather particles, flyAcross for silhouettes),
+   and CSS breaks specificity ties by source order — so this has to stay the final
+   word to reliably win for prefers-reduced-motion users. */
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  .bg-default,
+  .particles .particle,
+  .bird-silhouette { animation: none; }
+}
 </style>
 </head>
 <body>
