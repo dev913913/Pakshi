@@ -690,24 +690,41 @@ function playSoundForBird(bird, soundList, index) {
       return;
     }
     currentAudio = audio;
-    card.classList.remove('loading-sound');
-    card.classList.add('playing');
-    document.getElementById('playtxt-'+id).textContent = entry.label
-      ? '▸ ' + entry.label + (soundList.length > 1 ? ' · tap for next' : '')
-      : 'Now playing...';
+    // Re-query rather than reuse the `card` captured at the top of this function —
+    // a search filter can re-render the grid while this request was loading,
+    // destroying that element. Guard every lookup since either can now be null.
+    const liveCard = document.getElementById('card-'+id);
+    const liveText = document.getElementById('playtxt-'+id);
+    if (liveCard) { liveCard.classList.remove('loading-sound'); liveCard.classList.add('playing'); }
+    if (liveText) {
+      liveText.textContent = entry.label
+        ? '▸ ' + entry.label + (soundList.length > 1 ? ' · tap for next' : '')
+        : 'Now playing...';
+    }
     document.getElementById('npName').textContent = bird.common;
     document.getElementById('npSub').textContent = bird.hindi + ' · ' + bird.habitat + (entry.label ? ' · ' + entry.label : '');
     document.getElementById('nowPlaying').classList.add('visible');
     audio.loop = loopOn;
-    audio.play();
+    audio.play().catch(() => {
+      // Playback was blocked or failed even though it loaded fine — don't leave
+      // the UI claiming a bird is playing when nothing is actually audible.
+      if (requestSeq !== playRequestSeq) return;
+      currentAudio = null;
+      document.getElementById('nowPlaying').classList.remove('visible');
+      if (liveCard) liveCard.classList.remove('playing');
+      if (liveText) liveText.textContent = defaultPlayText(bird);
+      showToast("Playback was blocked for " + bird.common + " — try tapping it again.");
+    });
   }, { once: true });
 
   audio.addEventListener('ended', () => stopAll());
   audio.addEventListener('error', () => {
     // Only reset state if this audio still corresponds to the current request
     if (requestSeq === playRequestSeq) {
-      card.classList.remove('loading-sound');
-      document.getElementById('playtxt-'+id).textContent = defaultPlayText(bird);
+      const liveCard = document.getElementById('card-'+id);
+      const liveText = document.getElementById('playtxt-'+id);
+      if (liveCard) liveCard.classList.remove('loading-sound');
+      if (liveText) liveText.textContent = defaultPlayText(bird);
       currentBirdId = null;
       showToast("Sorry, sound failed to load for " + bird.common + (entry.label ? ' (' + entry.label + ')' : ''));
     }
