@@ -715,6 +715,10 @@ function playSoundForBird(bird, soundList, index) {
 }
 
 function stopAll() {
+  // Invalidate any in-flight play request — without this, audio that was still
+  // loading when the user hit Stop could pass the requestSeq check in
+  // playSoundForBird's canplaythrough handler and start playing anyway.
+  ++playRequestSeq;
   // Note: this intentionally does NOT touch ambientAudios — ambience sounds keep playing.
   if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; }
   currentBirdId = null;
