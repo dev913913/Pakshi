@@ -709,10 +709,10 @@ function playSoundForBird(bird, soundList, index) {
       // Playback was blocked or failed even though it loaded fine — don't leave
       // the UI claiming a bird is playing when nothing is actually audible.
       if (requestSeq !== playRequestSeq) return;
-      currentAudio = null;
-      document.getElementById('nowPlaying').classList.remove('visible');
-      if (liveCard) liveCard.classList.remove('playing');
-      if (liveText) liveText.textContent = defaultPlayText(bird);
+      // stopAll() (not a hand-rolled partial reset) matters here: it also clears
+      // currentBirdId, so the next tap on this bird is read as "play" again —
+      // not as "stop" (single sound) or "advance to the next sound" (multi-sound).
+      stopAll();
       showToast("Playback was blocked for " + bird.common + " — try tapping it again.");
     });
   }, { once: true });
