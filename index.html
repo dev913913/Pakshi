@@ -463,6 +463,7 @@ const BIRDS = [
 
 let currentAudio = null;
 let currentBirdId = null;
+let playRequestSeq = 0;
 
 // --- Layered sounds (independent of bird playback, and independent of each other) ---
 // Two groups share the exact same toggle/fade/loop behavior — add more sounds to
@@ -659,6 +660,11 @@ function playBird(id) {
 function playSoundForBird(bird, soundList, index) {
   const id = bird.id;
   const entry = soundList[index];
+  // A monotonic token for this specific play request. Using bird id alone isn't
+  // enough — cycling through a multi-sound bird (e.g. woodpecker Call -> Drumming)
+  // reuses the same id for two different in-flight loads, so id equality can't
+  // tell a stale request from the current one; this counter can.
+  const requestSeq = ++playRequestSeq;
 
   if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
   document.querySelectorAll('.bird-card').forEach(c => c.classList.remove('playing','loading-sound'));
@@ -677,6 +683,12 @@ function playSoundForBird(bird, soundList, index) {
   const audio = new Audio(entry.file);
   audio.loop = loopOn;
   audio.addEventListener('canplaythrough', () => {
+    if (requestSeq !== playRequestSeq) {
+      // The user moved on to a different play request while this one was still
+      // loading — don't let it start playing or touch state/UI for the wrong bird.
+      audio.pause();
+      return;
+    }
     currentAudio = audio;
     card.classList.remove('loading-sound');
     card.classList.add('playing');
@@ -692,8 +704,8 @@ function playSoundForBird(bird, soundList, index) {
 
   audio.addEventListener('ended', () => stopAll());
   audio.addEventListener('error', () => {
-    // Only reset state if this audio still corresponds to the current bird
-    if (currentBirdId === id) {
+    // Only reset state if this audio still corresponds to the current request
+    if (requestSeq === playRequestSeq) {
       card.classList.remove('loading-sound');
       document.getElementById('playtxt-'+id).textContent = defaultPlayText(bird);
       currentBirdId = null;
