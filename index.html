@@ -30,13 +30,26 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 body::before{content:'';position:fixed;inset:-50%;background:repeating-conic-gradient(from 0deg at 50% 50%,transparent 0deg,transparent 5deg,rgba(126,184,154,0.008) 5deg,rgba(126,184,154,0.008) 5.5deg);animation:bgSpin 200s linear infinite;pointer-events:none;z-index:0;}
 @keyframes bgSpin{to{transform:rotate(360deg);}}
 .bg-layer{position:fixed;inset:0;z-index:0;transition:opacity var(--transition);pointer-events:none;}
-.bg-default{background:radial-gradient(ellipse at 20% 50%,rgba(30,60,30,0.4) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(20,40,60,0.3) 0%,transparent 50%),linear-gradient(160deg,#0d1117 0%,#0a1a0e 50%,#0d1117 100%);opacity:1;}
+.bg-default{background:radial-gradient(ellipse at 20% 50%,rgba(30,60,30,0.4) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(20,40,60,0.3) 0%,transparent 50%),linear-gradient(160deg,#0d1117 0%,#0a1a0e 50%,#0d1117 100%);opacity:1;animation:bgBreathe 9s ease-in-out infinite;}
+@keyframes bgBreathe{0%,100%{filter:brightness(1);}50%{filter:brightness(1.12);}}
 .bg-active{opacity:0;}.bg-active.visible{opacity:1;}
 .particles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
-.particle{position:absolute;border-radius:50%;animation:drift linear infinite;opacity:0;}
+.particle{position:absolute;animation:drift linear infinite;opacity:0;}
+.particle.shape-dust,.particle.shape-water,.particle.shape-firefly{border-radius:50%;}
+.particle.shape-leaf{border-radius:0 100% 0 100%;}
+.particle.shape-feather{border-radius:50% 50% 50% 0%;}
 @keyframes drift{0%{transform:translateY(100vh) translateX(0) scale(0);opacity:0;}10%{opacity:1;}90%{opacity:0.6;}100%{transform:translateY(-20vh) translateX(var(--drift)) scale(1.5);opacity:0;}}
-.bird-silhouette{position:fixed;z-index:0;pointer-events:none;opacity:0;transition:opacity 0.8s ease;animation:flyAcross linear infinite;}
-.bird-silhouette.active{opacity:0.1;}
+.particle.shape-leaf,.particle.shape-feather{animation-name:driftFlutter;}
+@keyframes driftFlutter{
+  0%{transform:translateY(100vh) translateX(0) scale(0) rotate(0deg);opacity:0;}
+  10%{opacity:1;}
+  30%{transform:translateY(68vh) translateX(calc(var(--drift) * 0.3)) scale(1) rotate(calc(var(--rot) * 0.3));}
+  60%{transform:translateY(28vh) translateX(calc(var(--drift) * -0.25)) scale(1.2) rotate(calc(var(--rot) * 0.7));}
+  90%{opacity:0.6;}
+  100%{transform:translateY(-20vh) translateX(var(--drift)) scale(1.5) rotate(var(--rot));opacity:0;}
+}
+.bird-silhouette{position:fixed;z-index:0;pointer-events:none;opacity:0.05;transition:opacity 0.8s ease;animation:flyAcross linear infinite;}
+.bird-silhouette.active{opacity:0.12;}
 @keyframes flyAcross{0%{transform:translateX(-100px) translateY(0);}50%{transform:translateX(50vw) translateY(var(--flydip));}100%{transform:translateX(calc(100vw + 100px)) translateY(0);}}
 .ripple-container{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
 .ripple{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,0.15);animation:rippleOut 3s ease-out forwards;transform:translate(-50%,-50%);}
@@ -188,6 +201,17 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
   .featured-bird-hindi{text-align:left;}.featured-right{padding:16px 18px;}.featured-fact{font-size:14px;}
 }
 @media(max-width:380px){.birds-grid{grid-template-columns:1fr;}}
+
+/* Kept last on purpose: several rules above re-set animation-name for these same
+   selectors (driftFlutter for leaf/feather particles, flyAcross for silhouettes),
+   and CSS breaks specificity ties by source order — so this has to stay the final
+   word to reliably win for prefers-reduced-motion users. */
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  .bg-default,
+  .particles .particle,
+  .bird-silhouette { animation: none; }
+}
 </style>
 </head>
 <body>
@@ -197,6 +221,8 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 <div class="ripple-container" id="rippleContainer"></div>
 <svg class="bird-silhouette" style="top:15%;--flydip:-20px;animation-duration:18s;" viewBox="0 0 80 40" width="80" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 20 Q10 8 20 20 Q30 8 40 20 M40 20 Q50 8 60 20 Q70 8 80 20" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
 <svg class="bird-silhouette" style="top:35%;--flydip:15px;animation-duration:24s;animation-delay:-8s;" viewBox="0 0 60 30" width="50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 15 Q7.5 6 15 15 Q22.5 6 30 15 M30 15 Q37.5 6 45 15 Q52.5 6 60 15" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+<svg class="bird-silhouette" style="top:8%;--flydip:10px;animation-duration:32s;animation-delay:-16s;" viewBox="0 0 100 30" width="100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 15 Q25 2 50 15 Q75 2 100 15" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+<svg class="bird-silhouette" style="top:55%;--flydip:-12px;animation-duration:20s;animation-delay:-3s;" viewBox="0 0 40 20" width="34" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 10 Q5 3 10 10 Q15 3 20 10 M20 10 Q25 3 30 10 Q35 3 40 10" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
 
 <div class="ambience-panel">
   <div class="panel-section">
@@ -437,6 +463,7 @@ const BIRDS = [
 
 let currentAudio = null;
 let currentBirdId = null;
+let playRequestSeq = 0;
 
 // --- Layered sounds (independent of bird playback, and independent of each other) ---
 // Two groups share the exact same toggle/fade/loop behavior — add more sounds to
@@ -633,6 +660,11 @@ function playBird(id) {
 function playSoundForBird(bird, soundList, index) {
   const id = bird.id;
   const entry = soundList[index];
+  // A monotonic token for this specific play request. Using bird id alone isn't
+  // enough — cycling through a multi-sound bird (e.g. woodpecker Call -> Drumming)
+  // reuses the same id for two different in-flight loads, so id equality can't
+  // tell a stale request from the current one; this counter can.
+  const requestSeq = ++playRequestSeq;
 
   if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
   document.querySelectorAll('.bird-card').forEach(c => c.classList.remove('playing','loading-sound'));
@@ -651,25 +683,48 @@ function playSoundForBird(bird, soundList, index) {
   const audio = new Audio(entry.file);
   audio.loop = loopOn;
   audio.addEventListener('canplaythrough', () => {
+    if (requestSeq !== playRequestSeq) {
+      // The user moved on to a different play request while this one was still
+      // loading — don't let it start playing or touch state/UI for the wrong bird.
+      audio.pause();
+      return;
+    }
     currentAudio = audio;
-    card.classList.remove('loading-sound');
-    card.classList.add('playing');
-    document.getElementById('playtxt-'+id).textContent = entry.label
-      ? '▸ ' + entry.label + (soundList.length > 1 ? ' · tap for next' : '')
-      : 'Now playing...';
+    // Re-query rather than reuse the `card` captured at the top of this function —
+    // a search filter can re-render the grid while this request was loading,
+    // destroying that element. Guard every lookup since either can now be null.
+    const liveCard = document.getElementById('card-'+id);
+    const liveText = document.getElementById('playtxt-'+id);
+    if (liveCard) { liveCard.classList.remove('loading-sound'); liveCard.classList.add('playing'); }
+    if (liveText) {
+      liveText.textContent = entry.label
+        ? '▸ ' + entry.label + (soundList.length > 1 ? ' · tap for next' : '')
+        : 'Now playing...';
+    }
     document.getElementById('npName').textContent = bird.common;
     document.getElementById('npSub').textContent = bird.hindi + ' · ' + bird.habitat + (entry.label ? ' · ' + entry.label : '');
     document.getElementById('nowPlaying').classList.add('visible');
     audio.loop = loopOn;
-    audio.play();
+    audio.play().catch(() => {
+      // Playback was blocked or failed even though it loaded fine — don't leave
+      // the UI claiming a bird is playing when nothing is actually audible.
+      if (requestSeq !== playRequestSeq) return;
+      // stopAll() (not a hand-rolled partial reset) matters here: it also clears
+      // currentBirdId, so the next tap on this bird is read as "play" again —
+      // not as "stop" (single sound) or "advance to the next sound" (multi-sound).
+      stopAll();
+      showToast("Playback was blocked for " + bird.common + " — try tapping it again.");
+    });
   }, { once: true });
 
   audio.addEventListener('ended', () => stopAll());
   audio.addEventListener('error', () => {
-    // Only reset state if this audio still corresponds to the current bird
-    if (currentBirdId === id) {
-      card.classList.remove('loading-sound');
-      document.getElementById('playtxt-'+id).textContent = defaultPlayText(bird);
+    // Only reset state if this audio still corresponds to the current request
+    if (requestSeq === playRequestSeq) {
+      const liveCard = document.getElementById('card-'+id);
+      const liveText = document.getElementById('playtxt-'+id);
+      if (liveCard) liveCard.classList.remove('loading-sound');
+      if (liveText) liveText.textContent = defaultPlayText(bird);
       currentBirdId = null;
       showToast("Sorry, sound failed to load for " + bird.common + (entry.label ? ' (' + entry.label + ')' : ''));
     }
@@ -677,6 +732,10 @@ function playSoundForBird(bird, soundList, index) {
 }
 
 function stopAll() {
+  // Invalidate any in-flight play request — without this, audio that was still
+  // loading when the user hit Stop could pass the requestSeq check in
+  // playSoundForBird's canplaythrough handler and start playing anyway.
+  ++playRequestSeq;
   // Note: this intentionally does NOT touch ambientAudios — ambience sounds keep playing.
   if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; }
   currentBirdId = null;
@@ -686,25 +745,50 @@ function stopAll() {
   document.getElementById('featuredPanel').classList.remove('visible');
   document.querySelectorAll('.bird-silhouette').forEach(s => s.classList.remove('active'));
   document.getElementById('bgActive').style.opacity = '0';
+  spawnIdleParticles();
 }
 
 function updateBackground(bird) {
   const bg = document.getElementById('bgActive');
   bg.style.background = `${bird.bg},radial-gradient(ellipse at 30% 40%, ${bird.bgGlow} 0%,transparent 55%)`;
   bg.style.opacity = '1';
-  spawnParticles(bird.particleColor);
+  spawnParticles(bird.particleColor, bird.habitat);
 }
 
-function spawnParticles(color) {
+// Maps a bird's habitat text to the kind of thing that floats past while its call plays.
+function habitatToParticleType(habitat) {
+  const h = (habitat || '').toLowerCase();
+  if (h.includes('night')) return 'firefly';
+  if (h.includes('wetland') || h.includes('river')) return 'water';
+  if (h.includes('urban')) return 'dust';
+  return 'leaf'; // forest, garden, woodland, scrub, orchard, grove, farm, tropical, etc.
+}
+
+function createParticle(color, type, durMin, durMax) {
+  const p = document.createElement('div');
+  p.className = 'particle shape-' + type;
+  const base = type === 'leaf' ? Math.random()*5+5 : type === 'feather' ? Math.random()*4+4 : Math.random()*4+2;
+  const h = type === 'feather' ? base*1.6 : base;
+  let extra = `background:${color};`;
+  if (type === 'water') extra = `background:transparent;border:1.5px solid ${color};`;
+  if (type === 'firefly') extra = `background:${color};box-shadow:0 0 6px 2px ${color};`;
+  const dur = Math.random()*(durMax-durMin)+durMin;
+  p.style.cssText = `width:${base}px;height:${h}px;left:${Math.random()*100}%;${extra}--drift:${(Math.random()-0.5)*200}px;--rot:${(Math.random()-0.5)*360}deg;animation-duration:${dur}s;animation-delay:${Math.random()*4}s;`;
+  return p;
+}
+
+function spawnParticles(color, habitat) {
   const c = document.getElementById('particles');
   c.innerHTML = '';
-  for (let i = 0; i < 18; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-    const s = Math.random()*4+2;
-    p.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;background:${color};--drift:${(Math.random()-0.5)*200}px;animation-duration:${Math.random()*8+6}s;animation-delay:${Math.random()*4}s;`;
-    c.appendChild(p);
-  }
+  const type = habitatToParticleType(habitat);
+  for (let i = 0; i < 18; i++) c.appendChild(createParticle(color, type, 6, 14));
+}
+
+// A calm, slow, always-on ambience — active at rest, restored whenever playback stops.
+function spawnIdleParticles() {
+  const c = document.getElementById('particles');
+  c.innerHTML = '';
+  for (let i = 0; i < 7; i++) c.appendChild(createParticle('rgba(126,184,154,0.45)', 'leaf', 14, 24));
 }
 
 function spawnRipple(card) {
@@ -746,6 +830,7 @@ function showFeatured(bird) {
 
 renderGrid();
 renderAmbience();
+spawnIdleParticles();
 </script>
 </body>
 </html>
