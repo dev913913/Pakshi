@@ -42,6 +42,8 @@ body::before{content:'';position:fixed;inset:-50%;background:repeating-conic-gra
 .ripple{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,0.15);animation:rippleOut 3s ease-out forwards;transform:translate(-50%,-50%);}
 @keyframes rippleOut{0%{width:0;height:0;opacity:0.8;}100%{width:600px;height:600px;opacity:0;}}
 .wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px 100px;}
+/* Extra room at the bottom while a sound is playing, so the last cards are never hidden behind the facts panel + player bar */
+body.has-player .wrap{padding-bottom:300px;}
 header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .header-eyebrow{font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:6px;color:var(--muted);text-transform:uppercase;margin-bottom:16px;}
 .header-title{font-family:'Cormorant Garamond',serif;font-size:clamp(52px,8vw,86px);font-weight:600;line-height:0.95;color:var(--text);letter-spacing:-1px;}
@@ -51,11 +53,27 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .hdline{flex:1;max-width:140px;height:1px;background:linear-gradient(90deg,transparent,rgba(126,184,154,0.3),transparent);}
 .hddot{width:4px;height:4px;border-radius:50%;background:var(--accent);opacity:0.5;}
 
-/* --- Ambience panel (rain / wind / water / bugs) --- */
-.ambience-panel{position:fixed;top:20px;right:20px;z-index:101;background:rgba(13,17,23,0.75);
+/* --- Ambience toggle button + collapsible panel (rain / wind / water / bugs / instruments) --- */
+.amb-toggle{position:fixed;top:20px;right:20px;z-index:102;display:flex;align-items:center;gap:8px;
+  background:rgba(13,17,23,0.75);backdrop-filter:blur(14px);border:1px solid var(--border);color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:0.5px;padding:9px 14px;border-radius:999px;
+  cursor:pointer;transition:all 0.25s ease;box-shadow:0 6px 20px rgba(0,0,0,0.3);}
+.amb-toggle:hover{border-color:rgba(126,184,154,0.4);}
+.amb-toggle:active{transform:scale(0.95);}
+.amb-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.amb-toggle.has-active{border-color:var(--accent);color:var(--accent);}
+.amb-badge{display:none;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--accent);color:#0d1117;font-size:10px;font-weight:500;line-height:18px;text-align:center;}
+.ambience-panel{position:fixed;top:68px;right:20px;z-index:101;width:260px;background:rgba(13,17,23,0.92);
   backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:16px;
-  padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px;
+  padding:14px 16px 16px;display:none;flex-direction:column;gap:10px;
   box-shadow:0 8px 30px rgba(0,0,0,0.35);}
+.ambience-panel.open{display:flex;animation:fadeUp 0.25s ease both;}
+.amb-stopall{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:transparent;border:1px solid var(--border);color:var(--muted);
+  font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:9px 12px;border-radius:12px;cursor:pointer;transition:all 0.25s ease;}
+.amb-stopall:hover:not(:disabled){border-color:rgba(126,184,154,0.4);color:var(--accent);}
+.amb-stopall:active:not(:disabled){transform:scale(0.96);}
+.amb-stopall:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.amb-stopall:disabled{opacity:0.4;cursor:default;}
 .ambience-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);
   display:flex;align-items:center;gap:6px;}
 .ambience-label::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--accent);opacity:0.6;}
@@ -75,7 +93,10 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .ambience-btn.active .amb-icon{animation:ambPulse 1.8s ease-in-out infinite;}
 @keyframes ambPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
 @media(max-width:600px){
-  .ambience-panel{top:12px;right:12px;left:12px;padding:12px 14px 14px;border-radius:14px;gap:10px;}
+  /* On phones the button and panel scroll away with the page instead of hovering over the content */
+  .amb-toggle{position:absolute;top:14px;right:12px;}
+  /* In normal page flow (not floating), so its height pushes the title down instead of covering it */
+  .ambience-panel{position:relative;top:auto;right:auto;left:auto;width:auto;margin:56px 12px 0;padding:12px 14px 14px;border-radius:14px;gap:10px;}
   .panel-section{gap:6px;}
   .ambience-buttons{grid-template-columns:repeat(4,1fr);gap:6px;}
   .ambience-btn{flex-direction:column;padding:8px 4px;font-size:9px;gap:3px;}
@@ -88,7 +109,7 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .np-bar{width:3px;background:var(--accent);border-radius:2px;animation:waveBar 0.8s ease-in-out infinite alternate;}
 .np-bar:nth-child(1){height:14px;animation-delay:0s;}.np-bar:nth-child(2){height:20px;animation-delay:0.15s;}.np-bar:nth-child(3){height:10px;animation-delay:0.3s;}.np-bar:nth-child(4){height:18px;animation-delay:0.1s;}.np-bar:nth-child(5){height:12px;animation-delay:0.25s;}
 @keyframes waveBar{from{transform:scaleY(0.4);}to{transform:scaleY(1);}}
-.np-info{flex:1;}.np-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text);line-height:1;}.np-sub{font-size:11px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
+.np-info{flex:1;min-width:0;}.np-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text);line-height:1;}.np-sub{font-size:11px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
 .np-stop{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;cursor:pointer;transition:all 0.2s;flex-shrink:0;}
 .np-stop:hover{border-color:rgba(126,184,154,0.4);color:var(--accent);}
 .np-stop:active{transform:scale(0.95);}
@@ -100,29 +121,46 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .np-loop.active{border-color:var(--accent);color:var(--accent);background:rgba(126,184,154,0.12);box-shadow:0 0 16px rgba(126,184,154,0.15);}
 .np-loop .loop-icon{width:16px;height:16px;flex-shrink:0;display:block;}
 @media(max-width:600px){.np-loop{padding:8px 10px;}}
-.featured-panel{display:none;margin-bottom:3px;overflow:hidden;}
-.featured-panel.visible{display:flex;animation:featuredIn 0.45s cubic-bezier(0.4,0,0.2,1) both;}
-@keyframes featuredIn{from{opacity:0;transform:translateY(-12px);}to{opacity:1;transform:translateY(0);}}
-.featured-inner{display:flex;width:100%;border:1px solid rgba(126,184,154,0.35);border-top:3px solid var(--accent);background:rgba(126,184,154,0.04);overflow:hidden;}
-.featured-left{flex-shrink:0;width:200px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;border-right:1px solid var(--border);background:rgba(0,0,0,0.2);}
-.featured-photo-wrap{width:84px;height:84px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+
+/* --- Featured "Did you know" panel: now floats above the player bar, so it never pushes the cards down --- */
+.featured-panel{display:none;position:fixed;left:12px;right:12px;bottom:72px;max-width:1076px;margin:0 auto;z-index:99;max-height:42vh;overflow-y:auto;}
+.featured-panel.visible{display:block;animation:featuredIn 0.45s cubic-bezier(0.4,0,0.2,1) both;}
+@keyframes featuredIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.featured-inner{position:relative;display:flex;width:100%;border:1px solid rgba(126,184,154,0.35);border-top:3px solid var(--accent);
+  background:linear-gradient(rgba(126,184,154,0.06),rgba(126,184,154,0.06)),rgba(10,15,10,0.97);
+  backdrop-filter:blur(16px);overflow:hidden;box-shadow:0 -8px 30px rgba(0,0,0,0.4);}
+.featured-close{position:absolute;top:8px;right:8px;z-index:2;width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  background:transparent;border:1px solid var(--border);color:var(--muted);font-size:14px;line-height:1;cursor:pointer;border-radius:50%;transition:all 0.2s;}
+.featured-close:hover{border-color:rgba(126,184,154,0.4);color:var(--accent);}
+.featured-close:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.featured-left{flex-shrink:0;width:170px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 16px;border-right:1px solid var(--border);background:rgba(0,0,0,0.2);}
+.featured-meta{display:flex;flex-direction:column;align-items:center;min-width:0;max-width:100%;overflow-wrap:anywhere;}
+.featured-photo-wrap{width:64px;height:64px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
   filter:drop-shadow(0 0 24px rgba(126,184,154,0.5));animation:birdFloat 3s ease-in-out infinite;}
 @keyframes birdFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
-.featured-photo{width:84px;height:84px;border-radius:50%;object-fit:cover;border:2px solid rgba(126,184,154,0.4);}
-.featured-icon-img{width:84px;height:84px;object-fit:contain;filter:drop-shadow(0 4px 20px rgba(0,0,0,0.4));}
-.featured-emoji-fallback{font-size:66px;line-height:1;text-align:center;}
-.featured-bird-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--accent);margin-top:12px;text-align:center;line-height:1.4;max-width:100%;}
+.featured-photo{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid rgba(126,184,154,0.4);}
+.featured-icon-img{width:64px;height:64px;object-fit:contain;filter:drop-shadow(0 4px 20px rgba(0,0,0,0.4));}
+.featured-emoji-fallback{font-size:50px;line-height:1;text-align:center;}
+.featured-bird-name{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--accent);margin-top:10px;text-align:center;line-height:1.3;max-width:100%;}
 .featured-bird-hindi{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;color:var(--muted);margin-top:3px;text-align:center;max-width:100%;line-height:1.4;}
 .featured-habitat{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(126,184,154,0.4);margin-top:7px;}
-.featured-right{flex:1;padding:28px 28px 24px;display:flex;flex-direction:column;justify-content:center;gap:10px;}
+.featured-right{flex:1;padding:18px 46px 16px 22px;display:flex;flex-direction:column;justify-content:center;gap:8px;}
 .featured-label{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(126,184,154,0.4);}
-.featured-fact{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2vw,19px);line-height:1.7;color:rgba(232,224,212,0.8);font-style:italic;}
+.featured-fact{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2vw,19px);line-height:1.6;color:rgba(232,224,212,0.8);font-style:italic;}
 .featured-scientific{font-size:11px;color:rgba(232,224,212,0.55);letter-spacing:1px;font-style:italic;}
 .grid-label{font-size:11px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;margin-bottom:20px;animation:fadeUp 0.8s 0.1s ease both;}
 .search-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;animation:fadeUp 0.8s 0.15s ease both;}
 .bird-search{flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);
   font-family:'DM Sans',sans-serif;font-size:14px;padding:12px 16px;border-radius:10px;outline:none;
   transition:border-color 0.25s ease,background 0.25s ease;}
+.search-field{position:relative;flex:1;display:flex;min-width:0;}
+.search-field .bird-search{width:100%;min-width:0;padding-right:44px;}
+.search-clear{display:none;position:absolute;right:8px;top:50%;transform:translateY(-50%);width:28px;height:28px;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.08);border:none;border-radius:50%;color:var(--muted);font-size:13px;line-height:1;cursor:pointer;transition:all 0.2s;}
+.search-clear.visible{display:flex;}
+.search-clear:hover{background:rgba(255,255,255,0.16);color:var(--text);}
+.search-clear:active{transform:translateY(-50%) scale(0.9);}
+.search-clear:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 .bird-search::placeholder{color:var(--muted);}
 .bird-search:focus{border-color:rgba(126,184,154,0.5);background:rgba(255,255,255,0.06);}
 .search-count{font-size:11px;color:var(--muted);letter-spacing:0.5px;white-space:nowrap;flex-shrink:0;}
@@ -150,8 +188,9 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .bird-icon-img{width:96px;height:96px;object-fit:contain;filter:drop-shadow(0 4px 20px rgba(0,0,0,0.5));}
 .bird-card.playing .bird-icon-img{filter:drop-shadow(0 0 20px rgba(126,184,154,0.55));}
 .bird-emoji-fallback{font-size:60px;filter:drop-shadow(0 4px 20px rgba(0,0,0,0.5));line-height:1;}
-.habitat-tag{position:absolute;top:12px;right:12px;z-index:2;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.5);background:rgba(0,0,0,0.3);padding:4px 8px;border:1px solid rgba(255,255,255,0.1);}
-.multi-sound-tag{position:absolute;top:12px;left:12px;z-index:2;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);background:rgba(126,184,154,0.15);padding:4px 8px;border:1px solid rgba(126,184,154,0.3);border-radius:10px;}
+.card-tags{position:absolute;top:12px;left:12px;right:12px;z-index:2;display:flex;flex-wrap:wrap;gap:4px;pointer-events:none;}
+.habitat-tag{margin-left:auto;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.5);background:rgba(0,0,0,0.3);padding:4px 8px;border:1px solid rgba(255,255,255,0.1);}
+.multi-sound-tag{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);background:rgba(126,184,154,0.15);padding:4px 8px;border:1px solid rgba(126,184,154,0.3);border-radius:10px;}
 .bird-info{position:relative;z-index:2;padding:16px 20px 18px;background:linear-gradient(transparent,rgba(0,0,0,0.7) 40%,rgba(0,0,0,0.9));}
 .bird-common{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);line-height:1;}
 .bird-hindi{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:rgba(255,255,255,0.5);margin-top:2px;}
@@ -179,18 +218,46 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 .footer-credit a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 @media(max-width:600px){
-  header{padding-top:200px;}
+  header{padding-top:84px;}
+  body.amb-open header{padding-top:32px;}
   .birds-grid{grid-template-columns:repeat(2,1fr);}.bird-photo{width:64px;height:64px;}.bird-icon-img{width:64px;height:64px;}.bird-emoji-fallback{font-size:42px;}.bird-common{font-size:16px;}
   .now-playing{padding:12px 16px;}.np-name{font-size:15px;}
+  body.has-player .wrap{padding-bottom:320px;}
+  .featured-panel{left:8px;right:8px;max-height:38vh;}
   .featured-inner{flex-direction:column;}
-  .featured-left{width:100%;flex-direction:row;gap:16px;padding:16px 18px;border-right:none;border-bottom:1px solid var(--border);}
-  .featured-photo{width:56px;height:56px;}.featured-icon-img{width:56px;height:56px;}.featured-photo-wrap{animation:none;}.featured-bird-name{font-size:16px;text-align:left;margin-top:0;}
-  .featured-bird-hindi{text-align:left;}.featured-right{padding:16px 18px;}.featured-fact{font-size:14px;}
+  .featured-left{width:100%;flex-direction:row;gap:16px;padding:12px 44px 12px 16px;border-right:none;border-bottom:1px solid var(--border);}
+  .featured-photo{width:48px;height:48px;}.featured-icon-img{width:48px;height:48px;}.featured-photo-wrap{width:48px;height:48px;animation:none;}.featured-emoji-fallback{font-size:38px;}
+  .featured-meta{flex:1;align-items:flex-start;}
+  .featured-bird-name{font-size:16px;text-align:left;margin-top:0;}
+  .featured-bird-hindi{text-align:left;}.featured-right{padding:12px 16px;}.featured-fact{font-size:14px;}
 }
 @media(max-width:380px){.birds-grid{grid-template-columns:1fr;}}
+
+/* Wider screens: the sounds panel floats, so on short screens (e.g. a phone held sideways) it scrolls instead of running off the bottom */
+@media(min-width:601px){
+  .ambience-panel{max-height:calc(100vh - 80px);max-height:calc(100dvh - 80px);overflow-y:auto;}
+}
+
+/* --- Phones: stack the cards (tags, then icon, then name) so the text never covers the bird icon --- */
+@media(max-width:760px){
+  .bird-card{aspect-ratio:auto;justify-content:flex-start;}
+  .bird-photo-wrap{position:relative;inset:auto;flex:1;padding:46px 0 8px;}
+  .bird-info{padding:10px 12px 12px;}
+}
+@media(max-width:600px){
+  .card-tags{top:8px;left:8px;right:8px;}
+  .habitat-tag,.multi-sound-tag{font-size:8px;letter-spacing:1px;padding:3px 6px;}
+}
+
+/* --- Respect "reduce motion" device settings: turn off the spinning background, particles, flying birds and ripples --- */
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
+  *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;}
+  body::before,.particles,.ripple-container,.bird-silhouette{display:none !important;}
+}
 </style>
 </head>
-<body>
+<body class="amb-open">
 <div class="bg-layer bg-default"></div>
 <div class="bg-layer bg-active" id="bgActive"></div>
 <div class="particles" id="particles"></div>
@@ -198,7 +265,10 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 <svg class="bird-silhouette" style="top:15%;--flydip:-20px;animation-duration:18s;" viewBox="0 0 80 40" width="80" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 20 Q10 8 20 20 Q30 8 40 20 M40 20 Q50 8 60 20 Q70 8 80 20" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
 <svg class="bird-silhouette" style="top:35%;--flydip:15px;animation-duration:24s;animation-delay:-8s;" viewBox="0 0 60 30" width="50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 15 Q7.5 6 15 15 Q22.5 6 30 15 M30 15 Q37.5 6 45 15 Q52.5 6 60 15" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
 
-<div class="ambience-panel">
+<button type="button" class="amb-toggle" id="ambToggle" onclick="toggleAmbPanel()" aria-expanded="true" aria-controls="ambPanel" aria-label="Open ambience and instrument sounds">
+  <span aria-hidden="true">🎧</span><span>Sounds</span><span class="amb-badge" id="ambBadge" aria-hidden="true">0</span>
+</button>
+<div class="ambience-panel open" id="ambPanel">
   <div class="panel-section">
     <div class="ambience-label">Ambience</div>
     <div class="ambience-buttons" id="ambienceButtons"></div>
@@ -208,6 +278,8 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
     <div class="ambience-label">Instruments</div>
     <div class="ambience-buttons" id="instrumentButtons"></div>
   </div>
+  <div class="panel-divider"></div>
+  <button type="button" class="amb-stopall" id="ambStopAll" onclick="stopAllAmbient()" disabled>■ Turn all off</button>
 </div>
 
 <div class="wrap">
@@ -217,31 +289,14 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
     <div class="header-hindi">The voices of Indian birds</div>
     <div class="header-divider"><div class="hdline"></div><div class="hddot"></div><div class="hdline"></div></div>
   </header>
-  
-  <div class="featured-panel" id="featuredPanel">
-    <div class="featured-inner">
-      <div class="featured-left">
-        <div class="featured-photo-wrap">
-          <img class="featured-icon-img" id="featuredIconImg" src="" alt=""
-               onerror="this.style.display='none'; document.getElementById('featuredEmojiFallback').style.display='';" />
-          <div class="featured-emoji-fallback" id="featuredEmojiFallback" style="display:none">🐦</div>
-        </div>
-        <div class="featured-bird-name" id="featuredName">—</div>
-        <div class="featured-bird-hindi" id="featuredHindi">—</div>
-        <div class="featured-habitat" id="featuredHabitat">—</div>
-      </div>
-      <div class="featured-right">
-        <div class="featured-label">◆ Did you know</div>
-        <div class="featured-fact" id="featuredFact">—</div>
-        <div class="featured-scientific" id="featuredScientific">—</div>
-      </div>
-    </div>
-  </div>
 
   <div class="grid-label">◆ Tap a bird to hear its call</div>
   <div class="search-row">
     <label for="birdSearch" class="sr-only">Search birds by name, Hindi name, or habitat</label>
-    <input type="text" id="birdSearch" class="bird-search" placeholder="Search birds by name, Hindi name, or habitat…" autocomplete="off" oninput="filterBirds(this.value)"/>
+    <div class="search-field">
+      <input type="text" id="birdSearch" class="bird-search" placeholder="Search birds by name, Hindi name, or habitat…" autocomplete="off" oninput="filterBirds(this.value)"/>
+      <button type="button" class="search-clear" id="searchClear" onclick="clearSearch()" aria-label="Clear search">✕</button>
+    </div>
     <div class="search-count" id="searchCount" aria-live="polite"></div>
     <button type="button" class="share-btn" onclick="shareSite()" aria-label="Share Pakshi with someone">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -256,6 +311,30 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
   <footer><div class="footer-text">"In every walk with nature, one receives far more than he seeks." — John Muir</div>
   <div class="footer-credit">Built by <a href="https://dev-portfolio-3000.vercel.app/" target="_blank" rel="noopener noreferrer">Dev Kumar</a></div>
   </footer>
+</div>
+
+<!-- Facts panel: floats above the player bar so it never pushes the bird cards around -->
+<div class="featured-panel" id="featuredPanel">
+  <div class="featured-inner">
+    <button type="button" class="featured-close" onclick="hideFeatured()" aria-label="Hide bird facts">✕</button>
+    <div class="featured-left">
+      <div class="featured-photo-wrap">
+        <img class="featured-icon-img" id="featuredIconImg" src="" alt=""
+             onerror="this.style.display='none'; document.getElementById('featuredEmojiFallback').style.display='';" />
+        <div class="featured-emoji-fallback" id="featuredEmojiFallback" style="display:none">🐦</div>
+      </div>
+      <div class="featured-meta">
+        <div class="featured-bird-name" id="featuredName">—</div>
+        <div class="featured-bird-hindi" id="featuredHindi">—</div>
+        <div class="featured-habitat" id="featuredHabitat">—</div>
+      </div>
+    </div>
+    <div class="featured-right">
+      <div class="featured-label">◆ Did you know</div>
+      <div class="featured-fact" id="featuredFact">—</div>
+      <div class="featured-scientific" id="featuredScientific">—</div>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -280,6 +359,8 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 //   assets/rain.mp3, assets/wind.mp3, assets/water.mp3, assets/bugs.mp3
 // Instrument sounds need these files added to the assets folder:
 //   assets/flute.mp3, assets/guitar.mp3, assets/piano.mp3, assets/sitar.mp3
+
+const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 let toastTimer = null;
 function showToast(message) {
@@ -442,8 +523,16 @@ const BIRDS = [
   { id:'ostrich', common:'Ostrich', hindi:'शुतुरमुर्ग', scientific:'Struthio camelus', emoji:'🐦', habitat:'African Savannas', fact:"Native to Africa, the Ostrich is the world's largest living bird. Though it cannot fly, its powerful legs help it sprint across open grasslands at remarkable speeds. Ostriches are also raised in India, connecting the African wilderness with India's rich diversity of birdlife.", sound:'assets/ostrich.mp3', bg:'linear-gradient(160deg,#24150d 0%,#56351f 40%,#302015 100%)', bgGlow:'rgba(194,120,65,0.3)', particleColor:'#C28A65', cardBg:'linear-gradient(135deg,#56351f,#24150d)' }
 ];
 
+// --- Bird playback state ---
+// currentAudio is the ONE audio element that "owns" the player right now. Every event handler checks
+// that its own audio is still currentAudio, so a late event from an older tap can never change the UI
+// or stop the newer sound.
 let currentAudio = null;
 let currentBirdId = null;
+let currentSoundIndex = 0;
+let loopOn = false;
+let playState = 'idle';   // 'idle' | 'loading' | 'playing'
+let playLabel = '';       // text shown on the playing card
 
 // --- Layered sounds (independent of bird playback, and independent of each other) ---
 // Two groups share the exact same toggle/fade/loop behavior — add more sounds to
@@ -482,10 +571,52 @@ function renderAmbience() {
   });
 }
 
+// --- Ambience panel open/close ---
+function setAmbPanel(open) {
+  const panel = document.getElementById('ambPanel');
+  const toggle = document.getElementById('ambToggle');
+  panel.classList.toggle('open', open);
+  toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  document.body.classList.toggle('amb-open', open);
+}
+function toggleAmbPanel() {
+  setAmbPanel(!document.getElementById('ambPanel').classList.contains('open'));
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  const panel = document.getElementById('ambPanel');
+  if (!panel.classList.contains('open')) return;
+  const focusWasInside = panel.contains(document.activeElement);
+  setAmbPanel(false);
+  if (focusWasInside) document.getElementById('ambToggle').focus();
+});
+
+// Shows how many ambience/instrument sounds are on, so people know something is playing even when the panel is closed
+function updateAmbBadge() {
+  const count = Object.keys(ambientOn).filter(k => ambientOn[k]).length;
+  const badge = document.getElementById('ambBadge');
+  badge.textContent = count;
+  badge.style.display = count > 0 ? 'inline-block' : 'none';
+  document.getElementById('ambToggle').classList.toggle('has-active', count > 0);
+  document.getElementById('ambStopAll').disabled = count === 0;
+}
+
+// Turns off every ambience and instrument sound at once (bird sounds are not affected)
+function stopAllAmbient() {
+  ALL_SOUNDS.forEach(a => { if (ambientOn[a.id]) toggleAmbient(a.id); });
+  document.getElementById('ambToggle').focus(); // the button just became disabled, so keep keyboard focus somewhere sensible
+}
+
+function setAmbientButton(id, on) {
+  const btn = document.getElementById('amb-btn-' + id);
+  if (!btn) return;
+  btn.classList.toggle('active', on);
+  btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+}
+
 function toggleAmbient(id) {
   const conf = ALL_SOUNDS.find(a => a.id === id);
   if (!conf) return;
-  const btn = document.getElementById('amb-btn-' + id);
   const isOn = !!ambientOn[id];
 
   if (!isOn) {
@@ -498,26 +629,34 @@ function toggleAmbient(id) {
         audio.pause();
         delete ambientAudios[id];
         ambientOn[id] = false;
-        btn.classList.remove('active');
-        btn.setAttribute('aria-pressed', 'false');
+        setAmbientButton(id, false);
+        updateAmbBadge();
       });
       ambientAudios[id] = audio;
     }
     const audio = ambientAudios[id];
-    audio.play().catch(() => {
-      // Autoplay was blocked — shouldn't normally happen since this runs from a click.
-    });
+    const p = audio.play();
+    if (p && p.catch) {
+      p.catch((err) => {
+        // File problems are handled by the 'error' listener above. A blocked play (rare, since this runs from a tap) is undone here.
+        if (err && err.name === 'NotAllowedError') {
+          ambientOn[id] = false;
+          setAmbientButton(id, false);
+          updateAmbBadge();
+          showToast('Your browser blocked the sound. Tap ' + conf.label + ' again.');
+        }
+      });
+    }
     fadeAudio(audio, audio.volume, conf.volume, 800);
     ambientOn[id] = true;
-    btn.classList.add('active');
-    btn.setAttribute('aria-pressed', 'true');
+    setAmbientButton(id, true);
   } else {
     const audio = ambientAudios[id];
-    fadeAudio(audio, audio.volume, 0, 600, () => audio.pause());
+    if (audio) fadeAudio(audio, audio.volume, 0, 600, () => audio.pause());
     ambientOn[id] = false;
-    btn.classList.remove('active');
-    btn.setAttribute('aria-pressed', 'false');
+    setAmbientButton(id, false);
   }
+  updateAmbBadge();
 }
 
 function fadeAudio(audio, from, to, duration, onDone) {
@@ -547,6 +686,19 @@ function resetAllPlayTexts() {
   });
 }
 
+// Puts the current playing/loading look back on the right card. Called after every state change
+// AND after every grid redraw (e.g. while searching), so the playing highlight is never lost.
+function applyCardState() {
+  document.querySelectorAll('.bird-card').forEach(c => c.classList.remove('playing', 'loading-sound'));
+  resetAllPlayTexts();
+  if (!currentBirdId || playState === 'idle') return;
+  const card = document.getElementById('card-' + currentBirdId);
+  if (!card) return; // the playing bird is hidden by the current search — nothing to highlight
+  card.classList.add(playState === 'playing' ? 'playing' : 'loading-sound');
+  const txt = document.getElementById('playtxt-' + currentBirdId);
+  if (txt) txt.textContent = playLabel;
+}
+
 function renderGrid(list) {
   const birds = list || BIRDS;
   const grid = document.getElementById('birdsGrid');
@@ -566,8 +718,10 @@ function renderGrid(list) {
          onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();playBird('${b.id}');}"
          tabindex="0" role="button" aria-label="${b.sounds ? 'Play ' + b.common + ', tap again to cycle through ' + b.sounds.length + ' sounds' : 'Play ' + b.common + ' call'}"
          style="--card-bg:${b.cardBg}">
-      <div class="habitat-tag">${b.habitat}</div>
-      ${b.sounds ? `<div class="multi-sound-tag">${b.sounds.length} sounds</div>` : ''}
+      <div class="card-tags">
+        ${b.sounds ? `<div class="multi-sound-tag">${b.sounds.length} sounds</div>` : ''}
+        <div class="habitat-tag">${b.habitat}</div>
+      </div>
       <div class="bird-photo-wrap">
         <img class="bird-icon-img" src="assets/icons/${b.id}.png" alt="" loading="lazy"
              onerror="this.style.display='none'; this.nextElementSibling.style.display='';" />
@@ -583,9 +737,19 @@ function renderGrid(list) {
         </div>
       </div>
     </div>`).join('');
+
+  applyCardState();
+}
+
+function clearSearch() {
+  const input = document.getElementById('birdSearch');
+  input.value = '';
+  filterBirds('');
+  input.focus();
 }
 
 function filterBirds(query) {
+  document.getElementById('searchClear').classList.toggle('visible', query.length > 0);
   const q = query.trim().toLowerCase();
   const countEl = document.getElementById('searchCount');
   if (!q) {
@@ -602,9 +766,6 @@ function filterBirds(query) {
   countEl.textContent = filtered.length + (filtered.length === 1 ? ' bird' : ' birds');
   renderGrid(filtered);
 }
-
-let currentSoundIndex = 0;
-let loopOn = false;
 
 function toggleLoop() {
   loopOn = !loopOn;
@@ -641,58 +802,91 @@ function playSoundForBird(bird, soundList, index) {
   const id = bird.id;
   const entry = soundList[index];
 
-  if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
-  document.querySelectorAll('.bird-card').forEach(c => c.classList.remove('playing','loading-sound'));
-  resetAllPlayTexts();
+  // 1) Silence whatever was playing/loading RIGHT NOW (not later), so two sounds can never overlap.
+  if (currentAudio) {
+    const old = currentAudio;
+    currentAudio = null;
+    old.pause();
+    try { old.currentTime = 0; } catch (e) {}
+  }
 
+  // 2) Update the screen straight away.
   currentBirdId = id;
-  const card = document.getElementById('card-'+id);
-  card.classList.add('loading-sound');
-  document.getElementById('playtxt-'+id).textContent = 'Loading...';
+  currentSoundIndex = index;
+  playState = 'loading';
+  playLabel = 'Loading...';
+  applyCardState();
+
+  document.getElementById('npName').textContent = bird.common;
+  document.getElementById('npSub').textContent = bird.hindi + ' · ' + bird.habitat + (entry.label ? ' · ' + entry.label : '');
+  document.getElementById('nowPlaying').classList.add('visible');
+  document.body.classList.add('has-player');
 
   showFeatured(bird);
   updateBackground(bird);
-  spawnRipple(card);
+  const card = document.getElementById('card-' + id);
+  if (card) spawnRipple(card);
   document.querySelectorAll('.bird-silhouette').forEach(s => s.classList.add('active'));
 
+  // 3) Start the sound inside the tap itself. iPhones/Safari only allow sound that starts directly from a tap,
+  //    so we call play() right now and don't wait for the file to finish loading first.
   const audio = new Audio(entry.file);
   audio.loop = loopOn;
-  audio.addEventListener('canplaythrough', () => {
-    currentAudio = audio;
-    card.classList.remove('loading-sound');
-    card.classList.add('playing');
-    document.getElementById('playtxt-'+id).textContent = entry.label
+  currentAudio = audio;
+  const isCurrent = () => currentAudio === audio;
+
+  audio.addEventListener('playing', () => {
+    if (!isCurrent()) return;
+    playState = 'playing';
+    playLabel = entry.label
       ? '▸ ' + entry.label + (soundList.length > 1 ? ' · tap for next' : '')
       : 'Now playing...';
-    document.getElementById('npName').textContent = bird.common;
-    document.getElementById('npSub').textContent = bird.hindi + ' · ' + bird.habitat + (entry.label ? ' · ' + entry.label : '');
-    document.getElementById('nowPlaying').classList.add('visible');
-    audio.loop = loopOn;
-    audio.play();
+    applyCardState();
   }, { once: true });
 
-  audio.addEventListener('ended', () => stopAll());
-  audio.addEventListener('error', () => {
-    // Only reset state if this audio still corresponds to the current bird
-    if (currentBirdId === id) {
-      card.classList.remove('loading-sound');
-      document.getElementById('playtxt-'+id).textContent = defaultPlayText(bird);
-      currentBirdId = null;
-      showToast("Sorry, sound failed to load for " + bird.common + (entry.label ? ' (' + entry.label + ')' : ''));
-    }
+  audio.addEventListener('ended', () => {
+    if (isCurrent()) stopAll();
   });
+
+  audio.addEventListener('error', () => {
+    if (!isCurrent()) return;
+    stopAll();
+    showToast("Sorry, sound failed to load for " + bird.common + (entry.label ? ' (' + entry.label + ')' : ''));
+  });
+
+  const p = audio.play();
+  if (p && p.catch) {
+    p.catch((err) => {
+      if (!isCurrent()) return;               // an older tap — ignore
+      if (err && err.name === 'AbortError') return;
+      stopAll();
+      if (err && err.name === 'NotAllowedError') {
+        showToast('Your browser blocked the sound. Tap the bird again.');
+      } else {
+        showToast("Sorry, sound failed to load for " + bird.common + (entry.label ? ' (' + entry.label + ')' : ''));
+      }
+    });
+  }
 }
 
 function stopAll() {
   // Note: this intentionally does NOT touch ambientAudios — ambience sounds keep playing.
-  if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; }
+  if (currentAudio) {
+    const a = currentAudio;
+    currentAudio = null;   // set first, so any late events from this audio are ignored
+    a.pause();
+    try { a.currentTime = 0; } catch (e) {}
+  }
   currentBirdId = null;
-  document.querySelectorAll('.bird-card').forEach(c => c.classList.remove('playing','loading-sound'));
-  resetAllPlayTexts();
+  playState = 'idle';
+  playLabel = '';
+  applyCardState();
   document.getElementById('nowPlaying').classList.remove('visible');
   document.getElementById('featuredPanel').classList.remove('visible');
+  document.body.classList.remove('has-player');
   document.querySelectorAll('.bird-silhouette').forEach(s => s.classList.remove('active'));
   document.getElementById('bgActive').style.opacity = '0';
+  document.getElementById('particles').innerHTML = '';
 }
 
 function updateBackground(bird) {
@@ -705,6 +899,7 @@ function updateBackground(bird) {
 function spawnParticles(color) {
   const c = document.getElementById('particles');
   c.innerHTML = '';
+  if (reduceMotion) return;
   for (let i = 0; i < 18; i++) {
     const p = document.createElement('div');
     p.className = 'particle';
@@ -715,6 +910,7 @@ function spawnParticles(color) {
 }
 
 function spawnRipple(card) {
+  if (reduceMotion || !card) return;
   const c = document.getElementById('rippleContainer');
   const r = card.getBoundingClientRect();
   for (let i = 0; i < 3; i++) {
@@ -730,10 +926,29 @@ function spawnRipple(card) {
   }
 }
 
+// Sit exactly on top of the player bar, whatever height it has on this screen
+function positionFeatured() {
+  const barHeight = document.getElementById('nowPlaying').offsetHeight || 72;
+  document.getElementById('featuredPanel').style.bottom = (barHeight + 8) + 'px';
+}
+// The player bar can change height (phone rotated, window resized, text wrapping), so follow it
+if (typeof ResizeObserver !== 'undefined') {
+  new ResizeObserver(positionFeatured).observe(document.getElementById('nowPlaying'));
+} else {
+  window.addEventListener('resize', positionFeatured);
+}
+
+function hideFeatured() {
+  document.getElementById('featuredPanel').classList.remove('visible');
+}
+
 function showFeatured(bird) {
   const panel = document.getElementById('featuredPanel');
   panel.classList.remove('visible');
   setTimeout(() => {
+    // If the sound was stopped, or another bird was tapped, during this tiny delay, don't show a stale panel
+    if (currentBirdId !== bird.id) return;
+
     const fallback = document.getElementById('featuredEmojiFallback');
     fallback.textContent = bird.emoji;
     fallback.style.display = 'none';
@@ -747,6 +962,8 @@ function showFeatured(bird) {
     document.getElementById('featuredHabitat').textContent = bird.habitat;
     document.getElementById('featuredFact').textContent = bird.fact;
     document.getElementById('featuredScientific').textContent = bird.scientific;
+
+    positionFeatured();
     panel.classList.add('visible');
   }, 80);
 }
