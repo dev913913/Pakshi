@@ -123,7 +123,7 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 
 /* --- Featured "Did you know" panel: now floats above the player bar, so it never pushes the cards down --- */
 .featured-panel{display:none;position:fixed;left:12px;right:12px;bottom:72px;max-width:1076px;margin:0 auto;z-index:99;max-height:42vh;overflow-y:auto;}
-.featured-panel.visible{display:flex;animation:featuredIn 0.45s cubic-bezier(0.4,0,0.2,1) both;}
+.featured-panel.visible{display:block;animation:featuredIn 0.45s cubic-bezier(0.4,0,0.2,1) both;}
 @keyframes featuredIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 .featured-inner{position:relative;display:flex;width:100%;border:1px solid rgba(126,184,154,0.35);border-top:3px solid var(--accent);
   background:linear-gradient(rgba(126,184,154,0.06),rgba(126,184,154,0.06)),rgba(10,15,10,0.97);
@@ -897,6 +897,18 @@ function spawnRipple(card) {
   }
 }
 
+// Sit exactly on top of the player bar, whatever height it has on this screen
+function positionFeatured() {
+  const barHeight = document.getElementById('nowPlaying').offsetHeight || 72;
+  document.getElementById('featuredPanel').style.bottom = (barHeight + 8) + 'px';
+}
+// The player bar can change height (phone rotated, window resized, text wrapping), so follow it
+if (typeof ResizeObserver !== 'undefined') {
+  new ResizeObserver(positionFeatured).observe(document.getElementById('nowPlaying'));
+} else {
+  window.addEventListener('resize', positionFeatured);
+}
+
 function hideFeatured() {
   document.getElementById('featuredPanel').classList.remove('visible');
 }
@@ -922,9 +934,7 @@ function showFeatured(bird) {
     document.getElementById('featuredFact').textContent = bird.fact;
     document.getElementById('featuredScientific').textContent = bird.scientific;
 
-    // Sit exactly on top of the player bar, whatever height it has on this screen
-    const barHeight = document.getElementById('nowPlaying').offsetHeight || 72;
-    panel.style.bottom = (barHeight + 8) + 'px';
+    positionFeatured();
     panel.classList.add('visible');
   }, 80);
 }
