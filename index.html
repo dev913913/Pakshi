@@ -225,6 +225,11 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 }
 @media(max-width:380px){.birds-grid{grid-template-columns:1fr;}}
 
+/* Wider screens: the sounds panel floats, so on short screens (e.g. a phone held sideways) it scrolls instead of running off the bottom */
+@media(min-width:601px){
+  .ambience-panel{max-height:calc(100vh - 80px);max-height:calc(100dvh - 80px);overflow-y:auto;}
+}
+
 /* --- Phones: stack the cards (tags, then icon, then name) so the text never covers the bird icon --- */
 @media(max-width:760px){
   .bird-card{aspect-ratio:auto;justify-content:flex-start;}
