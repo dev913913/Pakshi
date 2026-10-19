@@ -95,7 +95,8 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 @media(max-width:600px){
   /* On phones the button and panel scroll away with the page instead of hovering over the content */
   .amb-toggle{position:absolute;top:14px;right:12px;}
-  .ambience-panel{position:absolute;top:60px;left:12px;right:12px;width:auto;padding:12px 14px 14px;border-radius:14px;gap:10px;}
+  /* In normal page flow (not floating), so its height pushes the title down instead of covering it */
+  .ambience-panel{position:relative;top:auto;right:auto;left:auto;width:auto;margin:56px 12px 0;padding:12px 14px 14px;border-radius:14px;gap:10px;}
   .panel-section{gap:6px;}
   .ambience-buttons{grid-template-columns:repeat(4,1fr);gap:6px;}
   .ambience-btn{flex-direction:column;padding:8px 4px;font-size:9px;gap:3px;}
@@ -209,7 +210,7 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 @media(max-width:600px){
   header{padding-top:84px;}
-  body.amb-open header{padding-top:230px;}
+  body.amb-open header{padding-top:32px;}
   .birds-grid{grid-template-columns:repeat(2,1fr);}.bird-photo{width:64px;height:64px;}.bird-icon-img{width:64px;height:64px;}.bird-emoji-fallback{font-size:42px;}.bird-common{font-size:16px;}
   .now-playing{padding:12px 16px;}.np-name{font-size:15px;}
   body.has-player .wrap{padding-bottom:320px;}
