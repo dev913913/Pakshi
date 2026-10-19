@@ -68,6 +68,12 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
   padding:14px 16px 16px;display:none;flex-direction:column;gap:10px;
   box-shadow:0 8px 30px rgba(0,0,0,0.35);}
 .ambience-panel.open{display:flex;animation:fadeUp 0.25s ease both;}
+.amb-stopall{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:transparent;border:1px solid var(--border);color:var(--muted);
+  font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:9px 12px;border-radius:12px;cursor:pointer;transition:all 0.25s ease;}
+.amb-stopall:hover:not(:disabled){border-color:rgba(126,184,154,0.4);color:var(--accent);}
+.amb-stopall:active:not(:disabled){transform:scale(0.96);}
+.amb-stopall:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.amb-stopall:disabled{opacity:0.4;cursor:default;}
 .ambience-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);
   display:flex;align-items:center;gap:6px;}
 .ambience-label::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--accent);opacity:0.6;}
@@ -172,8 +178,9 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .bird-icon-img{width:96px;height:96px;object-fit:contain;filter:drop-shadow(0 4px 20px rgba(0,0,0,0.5));}
 .bird-card.playing .bird-icon-img{filter:drop-shadow(0 0 20px rgba(126,184,154,0.55));}
 .bird-emoji-fallback{font-size:60px;filter:drop-shadow(0 4px 20px rgba(0,0,0,0.5));line-height:1;}
-.habitat-tag{position:absolute;top:12px;right:12px;z-index:2;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.5);background:rgba(0,0,0,0.3);padding:4px 8px;border:1px solid rgba(255,255,255,0.1);}
-.multi-sound-tag{position:absolute;top:12px;left:12px;z-index:2;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);background:rgba(126,184,154,0.15);padding:4px 8px;border:1px solid rgba(126,184,154,0.3);border-radius:10px;}
+.card-tags{position:absolute;top:12px;left:12px;right:12px;z-index:2;display:flex;flex-wrap:wrap;gap:4px;pointer-events:none;}
+.habitat-tag{margin-left:auto;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.5);background:rgba(0,0,0,0.3);padding:4px 8px;border:1px solid rgba(255,255,255,0.1);}
+.multi-sound-tag{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);background:rgba(126,184,154,0.15);padding:4px 8px;border:1px solid rgba(126,184,154,0.3);border-radius:10px;}
 .bird-info{position:relative;z-index:2;padding:16px 20px 18px;background:linear-gradient(transparent,rgba(0,0,0,0.7) 40%,rgba(0,0,0,0.9));}
 .bird-common{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);line-height:1;}
 .bird-hindi{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:rgba(255,255,255,0.5);margin-top:2px;}
@@ -215,6 +222,17 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 }
 @media(max-width:380px){.birds-grid{grid-template-columns:1fr;}}
 
+/* --- Phones: stack the cards (tags, then icon, then name) so the text never covers the bird icon --- */
+@media(max-width:760px){
+  .bird-card{aspect-ratio:auto;justify-content:flex-start;}
+  .bird-photo-wrap{position:relative;inset:auto;flex:1;padding:46px 0 8px;}
+  .bird-info{padding:10px 12px 12px;}
+}
+@media(max-width:600px){
+  .card-tags{top:8px;left:8px;right:8px;}
+  .habitat-tag,.multi-sound-tag{font-size:8px;letter-spacing:1px;padding:3px 6px;}
+}
+
 /* --- Respect "reduce motion" device settings: turn off the spinning background, particles, flying birds and ripples --- */
 @media (prefers-reduced-motion: reduce){
   html{scroll-behavior:auto;}
@@ -244,6 +262,8 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
     <div class="ambience-label">Instruments</div>
     <div class="ambience-buttons" id="instrumentButtons"></div>
   </div>
+  <div class="panel-divider"></div>
+  <button type="button" class="amb-stopall" id="ambStopAll" onclick="stopAllAmbient()" disabled>■ Turn all off</button>
 </div>
 
 <div class="wrap">
@@ -542,7 +562,12 @@ function toggleAmbPanel() {
   setAmbPanel(!document.getElementById('ambPanel').classList.contains('open'));
 }
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') setAmbPanel(false);
+  if (e.key !== 'Escape') return;
+  const panel = document.getElementById('ambPanel');
+  if (!panel.classList.contains('open')) return;
+  const focusWasInside = panel.contains(document.activeElement);
+  setAmbPanel(false);
+  if (focusWasInside) document.getElementById('ambToggle').focus();
 });
 
 // Shows how many ambience/instrument sounds are on, so people know something is playing even when the panel is closed
@@ -552,6 +577,13 @@ function updateAmbBadge() {
   badge.textContent = count;
   badge.style.display = count > 0 ? 'inline-block' : 'none';
   document.getElementById('ambToggle').classList.toggle('has-active', count > 0);
+  document.getElementById('ambStopAll').disabled = count === 0;
+}
+
+// Turns off every ambience and instrument sound at once (bird sounds are not affected)
+function stopAllAmbient() {
+  ALL_SOUNDS.forEach(a => { if (ambientOn[a.id]) toggleAmbient(a.id); });
+  document.getElementById('ambToggle').focus(); // the button just became disabled, so keep keyboard focus somewhere sensible
 }
 
 function setAmbientButton(id, on) {
@@ -665,8 +697,10 @@ function renderGrid(list) {
          onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();playBird('${b.id}');}"
          tabindex="0" role="button" aria-label="${b.sounds ? 'Play ' + b.common + ', tap again to cycle through ' + b.sounds.length + ' sounds' : 'Play ' + b.common + ' call'}"
          style="--card-bg:${b.cardBg}">
-      <div class="habitat-tag">${b.habitat}</div>
-      ${b.sounds ? `<div class="multi-sound-tag">${b.sounds.length} sounds</div>` : ''}
+      <div class="card-tags">
+        ${b.sounds ? `<div class="multi-sound-tag">${b.sounds.length} sounds</div>` : ''}
+        <div class="habitat-tag">${b.habitat}</div>
+      </div>
       <div class="bird-photo-wrap">
         <img class="bird-icon-img" src="assets/icons/${b.id}.png" alt="" loading="lazy"
              onerror="this.style.display='none'; this.nextElementSibling.style.display='';" />
