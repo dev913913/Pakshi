@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://pakshi-lovat.vercel.app/sitemap.xml
