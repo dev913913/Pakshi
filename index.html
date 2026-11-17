@@ -115,8 +115,6 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 }
 @media(max-width:600px){
   /* Compact layout for the sound buttons on phones */
- in the page flow above the title (so they never cover it) and scroll away;
-     the floating pill takes over from there */
   .amb-dock{padding:12px 12px 0;}
   .amb-dock .ambience-panel{max-width:none;}
   .amb-float .ambience-panel{width:min(360px,calc(100vw - 24px));}
@@ -636,8 +634,14 @@ function toggleFloatPanel() {
   setFloatPanel(!document.getElementById('ambFloatPanel').classList.contains('open'));
 }
 function updateFloatVisibility() {
-  document.getElementById('ambFloat').classList.toggle('visible', !ambDockVisible);
-  if (ambDockVisible) setFloatPanel(false); // back at the top: the docked panel takes over again
+  const float = document.getElementById('ambFloat');
+  const hadFocus = float.contains(document.activeElement);
+  float.classList.toggle('visible', !ambDockVisible);
+  if (ambDockVisible) {
+    setFloatPanel(false); // back at the top: the docked panel takes over again
+    // The floating controls are about to be hidden, so hand keyboard focus to the docked Sounds button
+    if (hadFocus) document.getElementById('ambToggle').focus({ preventScroll: true });
+  }
 }
 (function watchDockButton() {
   const dockToggle = document.getElementById('ambToggle');
