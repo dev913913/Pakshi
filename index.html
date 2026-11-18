@@ -78,7 +78,7 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .amb-float{position:fixed;top:max(10px,env(safe-area-inset-top));right:20px;z-index:102;display:flex;flex-direction:column;align-items:flex-end;gap:8px;pointer-events:none;
   opacity:0;visibility:hidden;transform:translateY(-8px);transition:opacity 0.25s ease,transform 0.25s ease,visibility 0s linear 0.25s;}
 .amb-float.visible{opacity:1;visibility:visible;transform:translateY(0);transition:opacity 0.25s ease,transform 0.25s ease,visibility 0s;}
-.amb-float > *{pointer-events:auto;}
+.amb-float.visible > *{pointer-events:auto;}
 .amb-float .amb-toggle{box-shadow:0 6px 20px rgba(0,0,0,0.4);}
 /* Never taller than the screen (minus the player bar), and scrolls inside itself when the screen is short */
 .amb-float .ambience-panel{background:rgba(13,17,23,0.97);max-height:calc(100vh - 84px - var(--np-h,0px));max-height:calc(100dvh - 84px - var(--np-h,0px));overflow-y:auto;overscroll-behavior:contain;}
@@ -148,6 +148,7 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 /* --- Featured "Did you know" panel: now floats above the player bar, so it never pushes the cards down --- */
 .featured-panel{display:none;position:fixed;left:12px;right:12px;bottom:72px;max-width:1076px;margin:0 auto;z-index:99;max-height:42vh;overflow-y:auto;}
 .featured-panel.visible{display:block;animation:featuredIn 0.45s cubic-bezier(0.4,0,0.2,1) both;}
+.featured-panel.visible.yield{display:none;}
 @keyframes featuredIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 .featured-inner{position:relative;display:flex;width:100%;border:1px solid rgba(126,184,154,0.35);border-top:3px solid var(--accent);
   background:linear-gradient(rgba(126,184,154,0.06),rgba(126,184,154,0.06)),rgba(10,15,10,0.97);
@@ -266,6 +267,12 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
   .habitat-tag,.multi-sound-tag{font-size:8px;letter-spacing:1px;padding:3px 6px;}
 }
 
+/* Short screens (phones held sideways): keep the "Did you know" panel small, so more of the page stays visible above it
+   and the Sounds buttons stay easy to reach. Long facts scroll inside the panel. */
+@media(max-height:480px){
+  .featured-panel{max-height:26vh;}
+}
+
 /* --- Respect "reduce motion" device settings: turn off the spinning background, particles, flying birds and ripples --- */
 @media (prefers-reduced-motion: reduce){
   html{scroll-behavior:auto;}
@@ -303,7 +310,7 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 </div>
 
 <!-- Floating Sounds controls: a small pill that appears once the docked button has scrolled out of view -->
-<div class="amb-float" id="ambFloat">
+<div class="amb-float" id="ambFloat" inert>
   <button type="button" class="amb-toggle" id="ambFloatToggle" onclick="toggleFloatPanel()" aria-expanded="false" aria-controls="ambFloatPanel" aria-label="Open ambience and instrument sounds">
     <span aria-hidden="true">🎧</span><span>Sounds</span><span class="amb-badge" aria-hidden="true">0</span>
   </button>
@@ -630,6 +637,18 @@ let ambDockVisible = true;
 function setFloatPanel(open) {
   document.getElementById('ambFloatPanel').classList.toggle('open', open);
   document.getElementById('ambFloatToggle').setAttribute('aria-expanded', open ? 'true' : 'false');
+  yieldFactsToFloat();
+}
+// If the open floating panel would sit on top of the facts box's "hide" (✕) button, hide the facts box until the panel closes,
+// so that button can never be blocked
+function yieldFactsToFloat() {
+  const facts = document.getElementById('featuredPanel');
+  facts.classList.remove('yield'); // measure with the facts box in place
+  const floatPanel = document.getElementById('ambFloatPanel');
+  if (!floatPanel.classList.contains('open') || !facts.classList.contains('visible')) return;
+  const a = floatPanel.getBoundingClientRect();
+  const b = facts.querySelector('.featured-close').getBoundingClientRect();
+  if (a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top) facts.classList.add('yield');
 }
 function toggleFloatPanel() {
   setFloatPanel(!document.getElementById('ambFloatPanel').classList.contains('open'));
@@ -643,21 +662,30 @@ function updateFloatVisibility() {
     // The floating controls are about to be hidden, so hand keyboard focus to the docked Sounds button
     if (hadFocus) document.getElementById('ambToggle').focus({ preventScroll: true });
   }
+  // While hidden (including during the fade-out) the floating controls can't be reached by keyboard or tap
+  float.toggleAttribute('inert', ambDockVisible);
+}
+// How much of the docked Sounds button is on screen right now (0 to 1), measured directly rather than trusted from an observer
+function dockToggleRatio() {
+  const r = document.getElementById('ambToggle').getBoundingClientRect();
+  const w = Math.max(0, Math.min(r.right, window.innerWidth) - Math.max(r.left, 0));
+  const h = Math.max(0, Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0));
+  return r.width * r.height > 0 ? (w * h) / (r.width * r.height) : 0;
+}
+// "Visible" means (nearly) fully in view, so the floating pill stays until the docked button is completely back
+// and focus is never handed to a half-hidden button
+function syncDockState() {
+  ambDockVisible = dockToggleRatio() >= 0.95;
+  updateFloatVisibility();
 }
 (function watchDockButton() {
   const dockToggle = document.getElementById('ambToggle');
   if ('IntersectionObserver' in window) {
-    // "Visible" means fully in view, so the floating pill stays until the docked button is completely back
-    // (and focus is never handed to a half-hidden button)
-    new IntersectionObserver((entries) => {
-      ambDockVisible = entries[entries.length - 1].intersectionRatio >= 0.95;
-      updateFloatVisibility();
-    }, { threshold: [0, 0.5, 0.95, 1] }).observe(dockToggle);
+    new IntersectionObserver(syncDockState, { threshold: [0, 0.5, 0.95, 1] }).observe(dockToggle);
   } else {
-    const check = () => { const r = dockToggle.getBoundingClientRect(); ambDockVisible = r.top >= 0 && r.bottom <= window.innerHeight; updateFloatVisibility(); };
-    window.addEventListener('scroll', check, { passive: true });
-    window.addEventListener('resize', check);
-    check(); // the page may already be scrolled when this runs
+    window.addEventListener('scroll', syncDockState, { passive: true });
+    window.addEventListener('resize', syncDockState);
+    syncDockState(); // the page may already be scrolled when this runs
   }
 })();
 
@@ -672,6 +700,7 @@ document.addEventListener('keydown', (e) => {
   }
   const panel = document.getElementById('ambPanel');
   if (!panel.classList.contains('open')) return;
+  syncDockState(); // use what is really on screen right now, not the last observer report
   const focusWasInside = panel.contains(document.activeElement);
   // If the docked Sounds button is scrolled out of view and focus is elsewhere, the person isn't using this panel: leave it alone
   if (!ambDockVisible && !focusWasInside) return;
@@ -703,6 +732,7 @@ function stopAllAmbient(btn) {
   // The button just became disabled, so keep keyboard focus on the matching Sounds button instead of losing it
   // If the docked button is off-screen, use the floating one; never scroll the page just to move focus
   const inFloat = btn && btn.closest('#ambFloat');
+  if (!inFloat) syncDockState(); // use what is really on screen right now, not the last observer report
   document.getElementById(inFloat || !ambDockVisible ? 'ambFloatToggle' : 'ambToggle').focus({ preventScroll: true });
 }
 
@@ -1029,12 +1059,25 @@ function spawnRipple(card) {
 
 // Sit exactly on top of the player bar, whatever height it has on this screen
 // Also tells the CSS how much of the screen the bar covers, so the floating Sounds panel stops above it
+let npClearTimer = null;
 function syncPlayerOffset() {
   const bar = document.getElementById('nowPlaying');
-  document.documentElement.style.setProperty('--np-h', (bar.classList.contains('visible') ? bar.offsetHeight : 0) + 'px');
+  const root = document.documentElement;
+  clearTimeout(npClearTimer); npClearTimer = null;
+  if (bar.classList.contains('visible')) { root.style.setProperty('--np-h', bar.offsetHeight + 'px'); return; }
+  // The bar is leaving: keep its space reserved while it slides off the screen, then release it.
+  // (If it is not animated, release it right away. A later restart cancels this, see the visible branch above.)
+  if (parseFloat(getComputedStyle(bar).transitionDuration) > 0.05) {
+    npClearTimer = setTimeout(() => {
+      if (!bar.classList.contains('visible')) root.style.setProperty('--np-h', '0px');
+    }, 450);
+  } else {
+    root.style.setProperty('--np-h', '0px');
+  }
 }
 function positionFeatured() {
   syncPlayerOffset();
+  yieldFactsToFloat();
   const barHeight = document.getElementById('nowPlaying').offsetHeight || 72;
   document.getElementById('featuredPanel').style.bottom = (barHeight + 8) + 'px';
 }
@@ -1072,6 +1115,7 @@ function showFeatured(bird) {
 
     positionFeatured();
     panel.classList.add('visible');
+    yieldFactsToFloat();
   }, 80);
 }
 
