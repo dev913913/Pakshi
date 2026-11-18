@@ -70,7 +70,8 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .ambience-panel.open{display:flex;animation:fadeUp 0.25s ease both;}
 
 /* --- Docked controls: part of the page at the top, they scroll away with it --- */
-.amb-dock{position:absolute;top:20px;right:20px;z-index:101;display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
+/* Part of the page: above the content (z-index 1) but below the fixed player bar (100) and facts panel (99), so it can never cover the Loop / Stop buttons */
+.amb-dock{position:absolute;top:20px;right:20px;z-index:2;display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
 
 /* --- Floating controls: only a small "Sounds" pill, shown once the docked button has scrolled out of view.
        Its panel opens on tap and closes on outside tap / Escape / scrolling back to the top. --- */
