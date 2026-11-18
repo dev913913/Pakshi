@@ -654,6 +654,7 @@ function updateFloatVisibility() {
     const check = () => { ambDockVisible = dockToggle.getBoundingClientRect().bottom > 0; updateFloatVisibility(); };
     window.addEventListener('scroll', check, { passive: true });
     window.addEventListener('resize', check);
+    check(); // the page may already be scrolled when this runs
   }
 })();
 
@@ -666,12 +667,14 @@ document.addEventListener('keydown', (e) => {
     if (focusWasInside) document.getElementById('ambFloatToggle').focus();
     return;
   }
-  if (!ambDockVisible) return; // the docked panel is off-screen, so leave it alone
   const panel = document.getElementById('ambPanel');
   if (!panel.classList.contains('open')) return;
   const focusWasInside = panel.contains(document.activeElement);
+  // If the docked Sounds button is scrolled out of view and focus is elsewhere, the person isn't using this panel: leave it alone
+  if (!ambDockVisible && !focusWasInside) return;
   setAmbPanel(false);
-  if (focusWasInside) document.getElementById('ambToggle').focus();
+  // Keep focus on a visible Sounds button (the floating one when the docked one is off-screen), without scrolling the page
+  if (focusWasInside) document.getElementById(ambDockVisible ? 'ambToggle' : 'ambFloatToggle').focus({ preventScroll: true });
 });
 // Tapping anywhere outside the floating panel closes it (the tap still reaches whatever was tapped, e.g. a bird card)
 document.addEventListener('click', (e) => {
