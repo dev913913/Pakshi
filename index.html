@@ -646,12 +646,14 @@ function updateFloatVisibility() {
 (function watchDockButton() {
   const dockToggle = document.getElementById('ambToggle');
   if ('IntersectionObserver' in window) {
+    // "Visible" means fully in view, so the floating pill stays until the docked button is completely back
+    // (and focus is never handed to a half-hidden button)
     new IntersectionObserver((entries) => {
-      ambDockVisible = entries[entries.length - 1].isIntersecting;
+      ambDockVisible = entries[entries.length - 1].intersectionRatio >= 0.95;
       updateFloatVisibility();
-    }).observe(dockToggle);
+    }, { threshold: [0, 0.5, 0.95, 1] }).observe(dockToggle);
   } else {
-    const check = () => { ambDockVisible = dockToggle.getBoundingClientRect().bottom > 0; updateFloatVisibility(); };
+    const check = () => { const r = dockToggle.getBoundingClientRect(); ambDockVisible = r.top >= 0 && r.bottom <= window.innerHeight; updateFloatVisibility(); };
     window.addEventListener('scroll', check, { passive: true });
     window.addEventListener('resize', check);
     check(); // the page may already be scrolled when this runs
@@ -698,8 +700,9 @@ function updateAmbBadge() {
 function stopAllAmbient(btn) {
   ALL_SOUNDS.forEach(a => { if (ambientOn[a.id]) toggleAmbient(a.id); });
   // The button just became disabled, so keep keyboard focus on the matching Sounds button instead of losing it
+  // If the docked button is off-screen, use the floating one; never scroll the page just to move focus
   const inFloat = btn && btn.closest('#ambFloat');
-  document.getElementById(inFloat ? 'ambFloatToggle' : 'ambToggle').focus();
+  document.getElementById(inFloat || !ambDockVisible ? 'ambFloatToggle' : 'ambToggle').focus({ preventScroll: true });
 }
 
 function setAmbientButton(id, on) {
