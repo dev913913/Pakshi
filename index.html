@@ -54,7 +54,7 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .hddot{width:4px;height:4px;border-radius:50%;background:var(--accent);opacity:0.5;}
 
 /* --- Ambience toggle button + collapsible panel (rain / wind / water / bugs / instruments) --- */
-.amb-toggle{position:fixed;top:20px;right:20px;z-index:102;display:flex;align-items:center;gap:8px;
+.amb-toggle{display:flex;align-items:center;gap:8px;
   background:rgba(13,17,23,0.75);backdrop-filter:blur(14px);border:1px solid var(--border);color:var(--text);
   font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:0.5px;padding:9px 14px;border-radius:999px;
   cursor:pointer;transition:all 0.25s ease;box-shadow:0 6px 20px rgba(0,0,0,0.3);}
@@ -63,11 +63,25 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .amb-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 .amb-toggle.has-active{border-color:var(--accent);color:var(--accent);}
 .amb-badge{display:none;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--accent);color:#0d1117;font-size:10px;font-weight:500;line-height:18px;text-align:center;}
-.ambience-panel{position:fixed;top:68px;right:20px;z-index:101;width:260px;background:rgba(13,17,23,0.92);
+.ambience-panel{width:260px;background:rgba(13,17,23,0.92);
   backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:16px;
   padding:14px 16px 16px;display:none;flex-direction:column;gap:10px;
   box-shadow:0 8px 30px rgba(0,0,0,0.35);}
 .ambience-panel.open{display:flex;animation:fadeUp 0.25s ease both;}
+
+/* --- Docked controls: part of the page at the top, they scroll away with it --- */
+/* Part of the page: above the content (z-index 1) but below the fixed player bar (100) and facts panel (99), so it can never cover the Loop / Stop buttons */
+.amb-dock{position:absolute;top:20px;right:20px;z-index:2;display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
+
+/* --- Floating controls: only a small "Sounds" pill, shown once the docked button has scrolled out of view.
+       Its panel opens on tap and closes on outside tap / Escape / scrolling back to the top. --- */
+.amb-float{position:fixed;top:max(10px,env(safe-area-inset-top));right:20px;z-index:102;display:flex;flex-direction:column;align-items:flex-end;gap:8px;pointer-events:none;
+  opacity:0;visibility:hidden;transform:translateY(-8px);transition:opacity 0.25s ease,transform 0.25s ease,visibility 0s linear 0.25s;}
+.amb-float.visible{opacity:1;visibility:visible;transform:translateY(0);transition:opacity 0.25s ease,transform 0.25s ease,visibility 0s;}
+.amb-float.visible > *{pointer-events:auto;}
+.amb-float .amb-toggle{box-shadow:0 6px 20px rgba(0,0,0,0.4);}
+/* Never taller than the screen (minus the player bar), and scrolls inside itself when the screen is short */
+.amb-float .ambience-panel{background:rgba(13,17,23,0.97);max-height:calc(100vh - 84px - var(--np-h,0px));max-height:calc(100dvh - 84px - var(--np-h,0px));overflow-y:auto;overscroll-behavior:contain;}
 .amb-stopall{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:transparent;border:1px solid var(--border);color:var(--muted);
   font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:9px 12px;border-radius:12px;cursor:pointer;transition:all 0.25s ease;}
 .amb-stopall:hover:not(:disabled){border-color:rgba(126,184,154,0.4);color:var(--accent);}
@@ -92,11 +106,20 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 .ambience-btn .amb-icon{font-size:14px;line-height:1;}
 .ambience-btn.active .amb-icon{animation:ambPulse 1.8s ease-in-out infinite;}
 @keyframes ambPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
+/* Phones, phones held sideways and small tablets: the docked controls sit in the page flow above the title,
+   so they can never cover it on narrow screens; the floating pill takes over once they scroll away */
+@media(max-width:900px){
+  .amb-dock{position:relative;top:auto;right:auto;padding:12px 20px 0;}
+  .amb-dock .ambience-panel{width:100%;max-width:420px;}
+  .amb-float{right:12px;}
+  header{padding-top:28px;}
+}
 @media(max-width:600px){
-  /* On phones the button and panel scroll away with the page instead of hovering over the content */
-  .amb-toggle{position:absolute;top:14px;right:12px;}
-  /* In normal page flow (not floating), so its height pushes the title down instead of covering it */
-  .ambience-panel{position:relative;top:auto;right:auto;left:auto;width:auto;margin:56px 12px 0;padding:12px 14px 14px;border-radius:14px;gap:10px;}
+  /* Compact layout for the sound buttons on phones */
+  .amb-dock{padding:12px 12px 0;}
+  .amb-dock .ambience-panel{max-width:none;}
+  .amb-float .ambience-panel{width:min(360px,calc(100vw - 24px));}
+  .ambience-panel{padding:12px 14px 14px;border-radius:14px;gap:10px;}
   .panel-section{gap:6px;}
   .ambience-buttons{grid-template-columns:repeat(4,1fr);gap:6px;}
   .ambience-btn{flex-direction:column;padding:8px 4px;font-size:9px;gap:3px;}
@@ -125,6 +148,7 @@ header{text-align:center;padding:72px 0 56px;animation:fadeUp 0.8s ease both;}
 /* --- Featured "Did you know" panel: now floats above the player bar, so it never pushes the cards down --- */
 .featured-panel{display:none;position:fixed;left:12px;right:12px;bottom:72px;max-width:1076px;margin:0 auto;z-index:99;max-height:42vh;overflow-y:auto;}
 .featured-panel.visible{display:block;animation:featuredIn 0.45s cubic-bezier(0.4,0,0.2,1) both;}
+.featured-panel.visible.yield{display:none;}
 @keyframes featuredIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 .featured-inner{position:relative;display:flex;width:100%;border:1px solid rgba(126,184,154,0.35);border-top:3px solid var(--accent);
   background:linear-gradient(rgba(126,184,154,0.06),rgba(126,184,154,0.06)),rgba(10,15,10,0.97);
@@ -218,8 +242,7 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 .footer-credit a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 @media(max-width:600px){
-  header{padding-top:84px;}
-  body.amb-open header{padding-top:32px;}
+  header{padding-top:28px;}
   .birds-grid{grid-template-columns:repeat(2,1fr);}.bird-photo{width:64px;height:64px;}.bird-icon-img{width:64px;height:64px;}.bird-emoji-fallback{font-size:42px;}.bird-common{font-size:16px;}
   .now-playing{padding:12px 16px;}.np-name{font-size:15px;}
   body.has-player .wrap{padding-bottom:320px;}
@@ -233,11 +256,6 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 }
 @media(max-width:380px){.birds-grid{grid-template-columns:1fr;}}
 
-/* Wider screens: the sounds panel floats, so on short screens (e.g. a phone held sideways) it scrolls instead of running off the bottom */
-@media(min-width:601px){
-  .ambience-panel{max-height:calc(100vh - 80px);max-height:calc(100dvh - 80px);overflow-y:auto;}
-}
-
 /* --- Phones: stack the cards (tags, then icon, then name) so the text never covers the bird icon --- */
 @media(max-width:760px){
   .bird-card{aspect-ratio:auto;justify-content:flex-start;}
@@ -249,6 +267,12 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
   .habitat-tag,.multi-sound-tag{font-size:8px;letter-spacing:1px;padding:3px 6px;}
 }
 
+/* Short screens (phones held sideways): keep the "Did you know" panel small, so more of the page stays visible above it
+   and the Sounds buttons stay easy to reach. Long facts scroll inside the panel. */
+@media(max-height:480px){
+  .featured-panel{max-height:26vh;}
+}
+
 /* --- Respect "reduce motion" device settings: turn off the spinning background, particles, flying birds and ripples --- */
 @media (prefers-reduced-motion: reduce){
   html{scroll-behavior:auto;}
@@ -257,7 +281,7 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 }
 </style>
 </head>
-<body class="amb-open">
+<body>
 <div class="bg-layer bg-default"></div>
 <div class="bg-layer bg-active" id="bgActive"></div>
 <div class="particles" id="particles"></div>
@@ -265,21 +289,44 @@ footer{margin-top:60px;text-align:center;padding-top:30px;border-top:1px solid v
 <svg class="bird-silhouette" style="top:15%;--flydip:-20px;animation-duration:18s;" viewBox="0 0 80 40" width="80" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 20 Q10 8 20 20 Q30 8 40 20 M40 20 Q50 8 60 20 Q70 8 80 20" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
 <svg class="bird-silhouette" style="top:35%;--flydip:15px;animation-duration:24s;animation-delay:-8s;" viewBox="0 0 60 30" width="50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 15 Q7.5 6 15 15 Q22.5 6 30 15 M30 15 Q37.5 6 45 15 Q52.5 6 60 15" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
 
-<button type="button" class="amb-toggle" id="ambToggle" onclick="toggleAmbPanel()" aria-expanded="true" aria-controls="ambPanel" aria-label="Open ambience and instrument sounds">
-  <span aria-hidden="true">🎧</span><span>Sounds</span><span class="amb-badge" id="ambBadge" aria-hidden="true">0</span>
-</button>
-<div class="ambience-panel open" id="ambPanel">
-  <div class="panel-section">
-    <div class="ambience-label">Ambience</div>
-    <div class="ambience-buttons" id="ambienceButtons"></div>
+<!-- Docked Sounds controls: part of the page at the top, they scroll away with it -->
+<div class="amb-dock" id="ambDock">
+  <button type="button" class="amb-toggle" id="ambToggle" onclick="toggleAmbPanel()" aria-expanded="true" aria-controls="ambPanel" aria-label="Open ambience and instrument sounds">
+    <span aria-hidden="true">🎧</span><span>Sounds</span><span class="amb-badge" aria-hidden="true">0</span>
+  </button>
+  <div class="ambience-panel open" id="ambPanel">
+    <div class="panel-section">
+      <div class="ambience-label">Ambience</div>
+      <div class="ambience-buttons" data-group="ambience"></div>
+    </div>
+    <div class="panel-divider"></div>
+    <div class="panel-section">
+      <div class="ambience-label">Instruments</div>
+      <div class="ambience-buttons" data-group="instruments"></div>
+    </div>
+    <div class="panel-divider"></div>
+    <button type="button" class="amb-stopall" onclick="stopAllAmbient(this)" disabled>■ Turn all off</button>
   </div>
-  <div class="panel-divider"></div>
-  <div class="panel-section">
-    <div class="ambience-label">Instruments</div>
-    <div class="ambience-buttons" id="instrumentButtons"></div>
+</div>
+
+<!-- Floating Sounds controls: a small pill that appears once the docked button has scrolled out of view -->
+<div class="amb-float" id="ambFloat" inert>
+  <button type="button" class="amb-toggle" id="ambFloatToggle" onclick="toggleFloatPanel()" aria-expanded="false" aria-controls="ambFloatPanel" aria-label="Open ambience and instrument sounds">
+    <span aria-hidden="true">🎧</span><span>Sounds</span><span class="amb-badge" aria-hidden="true">0</span>
+  </button>
+  <div class="ambience-panel" id="ambFloatPanel">
+    <div class="panel-section">
+      <div class="ambience-label">Ambience</div>
+      <div class="ambience-buttons" data-group="ambience"></div>
+    </div>
+    <div class="panel-divider"></div>
+    <div class="panel-section">
+      <div class="ambience-label">Instruments</div>
+      <div class="ambience-buttons" data-group="instruments"></div>
+    </div>
+    <div class="panel-divider"></div>
+    <button type="button" class="amb-stopall" onclick="stopAllAmbient(this)" disabled>■ Turn all off</button>
   </div>
-  <div class="panel-divider"></div>
-  <button type="button" class="amb-stopall" id="ambStopAll" onclick="stopAllAmbient()" disabled>■ Turn all off</button>
 </div>
 
 <div class="wrap">
@@ -539,7 +586,7 @@ let playLabel = '';       // text shown on the playing card
 // either group any time, the panel and logic are fully generic.
 const SOUND_GROUPS = [
   {
-    key: 'ambience', containerId: 'ambienceButtons',
+    key: 'ambience',
     sounds: [
       { id:'rain',  label:'Rain',  icon:'🌧️', file:'assets/rain.mp3',  volume:0.35 },
       { id:'wind',  label:'Wind',  icon:'💨', file:'assets/wind.mp3',  volume:0.30 },
@@ -548,7 +595,7 @@ const SOUND_GROUPS = [
     ]
   },
   {
-    key: 'instruments', containerId: 'instrumentButtons',
+    key: 'instruments',
     sounds: [
       { id:'flute',  label:'Flute',  icon:'🪈', file:'assets/flute.mp3',  volume:0.30 },
       { id:'guitar', label:'Guitar', icon:'🎸', file:'assets/guitar.mp3', volume:0.30 },
@@ -563,55 +610,137 @@ let ambientAudios = {}; // id -> Audio instance (created lazily on first toggle)
 let ambientOn = {};     // id -> boolean
 
 function renderAmbience() {
+  // The same buttons are drawn in both the docked panel and the floating panel, and kept in sync through data-amb
   SOUND_GROUPS.forEach(group => {
-    document.getElementById(group.containerId).innerHTML = group.sounds.map(a => `
-      <button type="button" class="ambience-btn" id="amb-btn-${a.id}" onclick="toggleAmbient('${a.id}')" aria-label="Toggle ${a.label}" aria-pressed="false">
+    const html = group.sounds.map(a => `
+      <button type="button" class="ambience-btn" data-amb="${a.id}" onclick="toggleAmbient('${a.id}')" aria-label="Toggle ${a.label}" aria-pressed="false">
         <span class="amb-icon">${a.icon}</span><span>${a.label}</span>
       </button>`).join('');
+    document.querySelectorAll('[data-group="' + group.key + '"]').forEach(el => { el.innerHTML = html; });
   });
 }
 
-// --- Ambience panel open/close ---
+// --- Docked panel (top of the page) open/close ---
+// This is the person's own choice for the top of the page. Scrolling never changes it, so scrolling back
+// up always shows the panel exactly as they left it: open if it was open, closed if it was closed.
 function setAmbPanel(open) {
-  const panel = document.getElementById('ambPanel');
-  const toggle = document.getElementById('ambToggle');
-  panel.classList.toggle('open', open);
-  toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-  document.body.classList.toggle('amb-open', open);
+  document.getElementById('ambPanel').classList.toggle('open', open);
+  document.getElementById('ambToggle').setAttribute('aria-expanded', open ? 'true' : 'false');
 }
 function toggleAmbPanel() {
   setAmbPanel(!document.getElementById('ambPanel').classList.contains('open'));
 }
+
+// --- Floating pill + panel: shown only while the docked Sounds button is scrolled out of view ---
+// Opening the floating panel is temporary. It always starts closed, and it never touches the docked panel's state.
+let ambDockVisible = true;
+function setFloatPanel(open) {
+  document.getElementById('ambFloatPanel').classList.toggle('open', open);
+  document.getElementById('ambFloatToggle').setAttribute('aria-expanded', open ? 'true' : 'false');
+  yieldFactsToFloat();
+}
+// If the open floating panel would sit on top of the facts box's "hide" (✕) button, hide the facts box until the panel closes,
+// so that button can never be blocked
+function yieldFactsToFloat() {
+  const facts = document.getElementById('featuredPanel');
+  facts.classList.remove('yield'); // measure with the facts box in place
+  const floatPanel = document.getElementById('ambFloatPanel');
+  if (!floatPanel.classList.contains('open') || !facts.classList.contains('visible')) return;
+  const a = floatPanel.getBoundingClientRect();
+  const b = facts.querySelector('.featured-close').getBoundingClientRect();
+  if (a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top) facts.classList.add('yield');
+}
+function toggleFloatPanel() {
+  setFloatPanel(!document.getElementById('ambFloatPanel').classList.contains('open'));
+}
+function updateFloatVisibility() {
+  const float = document.getElementById('ambFloat');
+  const hadFocus = float.contains(document.activeElement);
+  float.classList.toggle('visible', !ambDockVisible);
+  if (ambDockVisible) {
+    setFloatPanel(false); // back at the top: the docked panel takes over again
+    // The floating controls are about to be hidden, so hand keyboard focus to the docked Sounds button
+    if (hadFocus) document.getElementById('ambToggle').focus({ preventScroll: true });
+  }
+  // While hidden (including during the fade-out) the floating controls can't be reached by keyboard or tap
+  float.toggleAttribute('inert', ambDockVisible);
+}
+// How much of the docked Sounds button is on screen right now (0 to 1), measured directly rather than trusted from an observer
+function dockToggleRatio() {
+  const r = document.getElementById('ambToggle').getBoundingClientRect();
+  const w = Math.max(0, Math.min(r.right, window.innerWidth) - Math.max(r.left, 0));
+  const h = Math.max(0, Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0));
+  return r.width * r.height > 0 ? (w * h) / (r.width * r.height) : 0;
+}
+// "Visible" means (nearly) fully in view, so the floating pill stays until the docked button is completely back
+// and focus is never handed to a half-hidden button
+function syncDockState() {
+  ambDockVisible = dockToggleRatio() >= 0.95;
+  updateFloatVisibility();
+}
+(function watchDockButton() {
+  const dockToggle = document.getElementById('ambToggle');
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(syncDockState, { threshold: [0, 0.5, 0.95, 1] }).observe(dockToggle);
+  } else {
+    window.addEventListener('scroll', syncDockState, { passive: true });
+    window.addEventListener('resize', syncDockState);
+    syncDockState(); // the page may already be scrolled when this runs
+  }
+})();
+
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
+  const floatPanel = document.getElementById('ambFloatPanel');
+  if (floatPanel.classList.contains('open')) {
+    const focusWasInside = floatPanel.contains(document.activeElement);
+    setFloatPanel(false);
+    if (focusWasInside) document.getElementById('ambFloatToggle').focus();
+    return;
+  }
   const panel = document.getElementById('ambPanel');
   if (!panel.classList.contains('open')) return;
+  syncDockState(); // use what is really on screen right now, not the last observer report
   const focusWasInside = panel.contains(document.activeElement);
+  // If the docked Sounds button is scrolled out of view and focus is elsewhere, the person isn't using this panel: leave it alone
+  if (!ambDockVisible && !focusWasInside) return;
   setAmbPanel(false);
-  if (focusWasInside) document.getElementById('ambToggle').focus();
+  // Keep focus on a visible Sounds button (the floating one when the docked one is off-screen), without scrolling the page
+  if (focusWasInside) document.getElementById(ambDockVisible ? 'ambToggle' : 'ambFloatToggle').focus({ preventScroll: true });
+});
+// Tapping anywhere outside the floating panel closes it (the tap still reaches whatever was tapped, e.g. a bird card)
+document.addEventListener('click', (e) => {
+  if (!document.getElementById('ambFloatPanel').classList.contains('open')) return;
+  if (document.getElementById('ambFloat').contains(e.target)) return;
+  setFloatPanel(false);
 });
 
 // Shows how many ambience/instrument sounds are on, so people know something is playing even when the panel is closed
 function updateAmbBadge() {
   const count = Object.keys(ambientOn).filter(k => ambientOn[k]).length;
-  const badge = document.getElementById('ambBadge');
-  badge.textContent = count;
-  badge.style.display = count > 0 ? 'inline-block' : 'none';
-  document.getElementById('ambToggle').classList.toggle('has-active', count > 0);
-  document.getElementById('ambStopAll').disabled = count === 0;
+  document.querySelectorAll('.amb-badge').forEach(b => {
+    b.textContent = count;
+    b.style.display = count > 0 ? 'inline-block' : 'none';
+  });
+  document.querySelectorAll('.amb-toggle').forEach(t => t.classList.toggle('has-active', count > 0));
+  document.querySelectorAll('.amb-stopall').forEach(b => { b.disabled = count === 0; });
 }
 
 // Turns off every ambience and instrument sound at once (bird sounds are not affected)
-function stopAllAmbient() {
+function stopAllAmbient(btn) {
   ALL_SOUNDS.forEach(a => { if (ambientOn[a.id]) toggleAmbient(a.id); });
-  document.getElementById('ambToggle').focus(); // the button just became disabled, so keep keyboard focus somewhere sensible
+  // The button just became disabled, so keep keyboard focus on the matching Sounds button instead of losing it
+  // If the docked button is off-screen, use the floating one; never scroll the page just to move focus
+  const inFloat = btn && btn.closest('#ambFloat');
+  if (!inFloat) syncDockState(); // use what is really on screen right now, not the last observer report
+  document.getElementById(inFloat || !ambDockVisible ? 'ambFloatToggle' : 'ambToggle').focus({ preventScroll: true });
 }
 
 function setAmbientButton(id, on) {
-  const btn = document.getElementById('amb-btn-' + id);
-  if (!btn) return;
-  btn.classList.toggle('active', on);
-  btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  document.querySelectorAll('[data-amb="' + id + '"]').forEach(btn => {
+    btn.classList.toggle('active', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
 }
 
 function toggleAmbient(id) {
@@ -820,6 +949,7 @@ function playSoundForBird(bird, soundList, index) {
   document.getElementById('npName').textContent = bird.common;
   document.getElementById('npSub').textContent = bird.hindi + ' · ' + bird.habitat + (entry.label ? ' · ' + entry.label : '');
   document.getElementById('nowPlaying').classList.add('visible');
+  syncPlayerOffset();
   document.body.classList.add('has-player');
 
   showFeatured(bird);
@@ -882,6 +1012,7 @@ function stopAll() {
   playLabel = '';
   applyCardState();
   document.getElementById('nowPlaying').classList.remove('visible');
+  syncPlayerOffset();
   document.getElementById('featuredPanel').classList.remove('visible');
   document.body.classList.remove('has-player');
   document.querySelectorAll('.bird-silhouette').forEach(s => s.classList.remove('active'));
@@ -927,16 +1058,35 @@ function spawnRipple(card) {
 }
 
 // Sit exactly on top of the player bar, whatever height it has on this screen
+// Also tells the CSS how much of the screen the bar covers, so the floating Sounds panel stops above it
+let npClearTimer = null;
+function syncPlayerOffset() {
+  const bar = document.getElementById('nowPlaying');
+  const root = document.documentElement;
+  clearTimeout(npClearTimer); npClearTimer = null;
+  if (bar.classList.contains('visible')) { root.style.setProperty('--np-h', bar.offsetHeight + 'px'); return; }
+  // The bar is leaving: keep its space reserved while it slides off the screen, then release it.
+  // (If it is not animated, release it right away. A later restart cancels this, see the visible branch above.)
+  if (parseFloat(getComputedStyle(bar).transitionDuration) > 0.05) {
+    npClearTimer = setTimeout(() => {
+      if (!bar.classList.contains('visible')) root.style.setProperty('--np-h', '0px');
+    }, 450);
+  } else {
+    root.style.setProperty('--np-h', '0px');
+  }
+}
 function positionFeatured() {
+  syncPlayerOffset();
+  yieldFactsToFloat();
   const barHeight = document.getElementById('nowPlaying').offsetHeight || 72;
   document.getElementById('featuredPanel').style.bottom = (barHeight + 8) + 'px';
 }
 // The player bar can change height (phone rotated, window resized, text wrapping), so follow it
 if (typeof ResizeObserver !== 'undefined') {
   new ResizeObserver(positionFeatured).observe(document.getElementById('nowPlaying'));
-} else {
-  window.addEventListener('resize', positionFeatured);
 }
+// A change in screen height alone (e.g. the phone's address bar hiding) moves the panels without resizing the player bar
+window.addEventListener('resize', positionFeatured);
 
 function hideFeatured() {
   document.getElementById('featuredPanel').classList.remove('visible');
@@ -965,6 +1115,7 @@ function showFeatured(bird) {
 
     positionFeatured();
     panel.classList.add('visible');
+    yieldFactsToFloat();
   }, 80);
 }
 
