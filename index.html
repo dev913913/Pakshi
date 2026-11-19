@@ -1084,9 +1084,9 @@ function positionFeatured() {
 // The player bar can change height (phone rotated, window resized, text wrapping), so follow it
 if (typeof ResizeObserver !== 'undefined') {
   new ResizeObserver(positionFeatured).observe(document.getElementById('nowPlaying'));
-} else {
-  window.addEventListener('resize', positionFeatured);
 }
+// A change in screen height alone (e.g. the phone's address bar hiding) moves the panels without resizing the player bar
+window.addEventListener('resize', positionFeatured);
 
 function hideFeatured() {
   document.getElementById('featuredPanel').classList.remove('visible');
